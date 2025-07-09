@@ -27,25 +27,10 @@ const ThankYouNoteScreen = () => {
     const [loading, setLoading] = useState(false);
     const { userId } = useSelector(state => state.Auth);
     const [filteredMembers, setFilteredMembers] = useState([]);
+    const [allMembers, setAllMembers] = useState([]);
     const navigation = useNavigation();
-    const [members] = useState([
-        { id: 1, name: 'John Doe' },
-        { id: 2, name: 'Jane Smith' },
-        { id: 3, name: 'Alice Johnson' },
-        { id: 4, name: 'Bob Williams' },
-        { id: 5, name: 'Rajiv' },
-        { id: 6, name: 'Sai Kumar' },
-        { id: 7, name: 'Rajive Chand' },
-        { id: 8, name: 'Rajeev' },
-        { id: 9, name: 'Rajiv Kakara' },
-        { id: 10, name: 'Rajivchand Kakara' },
-        // { id: 11, name: 'Mahesh3' },
-        // { id: 12, name: 'Maneesh' },
-        // { id: 13, name: 'MaheshBabu' },
-        // { id: 14, name: 'Mahesh gunana' },
-        // { id: 15, name: 'Mahesh5' },
-        // { id: 16, name: 'Mahesh7' },
-    ]);
+    const [errors, setErrors] = useState({});
+
 
     // const filteredMembers = members.filter(member =>
     //     member.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -60,11 +45,13 @@ const ThankYouNoteScreen = () => {
             const data = await resp.data.data || [];
             console.log(data[0], 'data')
             if (resp.data.status == 200) {
-                const filteredMembers = data?.filter(member =>
-                    member.rnb_customer_name?.toLowerCase().includes(searchQuery.toLowerCase())
-                );
+                // const filteredMembers = data?.filter(member =>
+                //     member.rnb_customer_name?.toLowerCase().includes(searchQuery.toLowerCase())
+                // );
                 // console.log(filteredMembers, 'Members');
-                setFilteredMembers(filteredMembers);
+                // setFilteredMembers(filteredMembers);
+                setAllMembers(data); // store all
+                setFilteredMembers(data); // initially same
             }
         } catch (error) {
             console.log('Error', error);
@@ -72,8 +59,33 @@ const ThankYouNoteScreen = () => {
         }
     }
 
+    useEffect(() => {
+        if (searchQuery.trim() === '') {
+            setFilteredMembers([]); // show nothing
+        } else {
+            const filtered = allMembers.filter(member =>
+                member.rnb_customer_name?.toLowerCase().includes(searchQuery.toLowerCase())
+            );
+            setFilteredMembers(filtered);
+        }
+    }, [searchQuery, allMembers]);
+
 
     const handleSubmit = async () => {
+        let tempErrors = {};
+
+        if (!selectedUser) {
+            tempErrors.selectedUser = 'Please select a member to thank.';
+        }
+        if (!amount || isNaN(amount) || parseFloat(amount) <= 0) {
+            tempErrors.amount = 'Please enter a valid amount.';
+        }
+        setErrors(tempErrors);
+        if (Object.keys(tempErrors).length > 0) {
+            setErrors(tempErrors);
+            return;
+        }
+        setErrors({}); // Clear previous errors
         // const formData = {
         //     thankYouTo: selectedUser ? selectedUser.name : '',
         //     amount,
@@ -101,7 +113,7 @@ const ThankYouNoteScreen = () => {
                 Toast.show({
                     type: 'success',
                     text1: 'Success',
-                    text2: 'submitted Successfully.',
+                    text2: 'Thank You Note submitted successfully',
                     position: 'top',
                     visibilityTime: 3000,
                 });
@@ -128,24 +140,27 @@ const ThankYouNoteScreen = () => {
             <ScrollView style={{ paddingHorizontal: 16, flex: 1 }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
                 <View style={styles.form}>
                     {/* Thank You To Search Input */}
-                    <View style={styles.inputWrapper}>
-                        <TextInput
-                            placeholder="Thank You to:"
-                            value={selectedUser ? selectedUser.rnb_customer_name : searchQuery}
-                            // onChangeText={(text) => {
-                            //     setSearchQuery(text);
-                            //     setSelectedUser(null);
-                            // }}
-                            onChangeText={(text) => {
-                                setSearchQuery(text);
-                                if (text === '') {
+                    <View style={{ marginBottom: 20 }}>
+                        <View style={styles.inputWrapper}>
+                            <TextInput
+                                placeholder="Thank You to:"
+                                value={selectedUser ? selectedUser.rnb_customer_name : searchQuery}
+                                // onChangeText={(text) => {
+                                //     setSearchQuery(text);
+                                //     setSelectedUser(null);
+                                // }}
+                                onChangeText={(text) => {
+                                    setSearchQuery(text);
+                                    // if (text === '') {
                                     setSelectedUser(null); // Clear selected user when search query is cleared
-                                }
-                            }}
-                            style={styles.input}
-                            placeholderTextColor="#7D7D7D"
-                        />
-                        <Feather name="search" size={18} color={commonStyles.mainColor} style={styles.rightIcon} />
+                                    // }
+                                }}
+                                style={styles.input}
+                                placeholderTextColor="#7D7D7D"
+                            />
+                            <Feather name="search" size={18} color={commonStyles.mainColor} style={styles.rightIcon} />
+                        </View>
+                        {errors.selectedUser && <Text style={{ color: 'red', marginTop: 4 }}>{errors.selectedUser}</Text>}
                     </View>
 
                     {searchQuery && !selectedUser && (
@@ -159,6 +174,9 @@ const ThankYouNoteScreen = () => {
                                             onPress={() => {
                                                 setSelectedUser(member);
                                                 setSearchQuery('');
+                                                if (errors.selectedUser) {
+                                                    setErrors(prev => ({ ...prev, selectedUser: '' }));
+                                                }
                                             }}
                                         >
                                             <Text>{member.rnb_customer_name}</Text>
@@ -172,17 +190,24 @@ const ThankYouNoteScreen = () => {
                     )}
 
                     {/* Amount Field */}
-                    <View style={styles.inputWrapper}>
-                        <FontAwesome6 name="indian-rupee-sign" size={18} color={commonStyles.mainColor} style={styles.leftIcon} />
-                        <View style={{ height: 20, backgroundColor: '#7D7D7D', width: 1, position: 'absolute', left: 27, top: 14 }} />
-                        <TextInput
-                            placeholder="Amount"
-                            keyboardType="numeric"
-                            value={amount}
-                            onChangeText={setAmount}
-                            style={[styles.input, { paddingLeft: 35 }]}
-                            placeholderTextColor="#7D7D7D"
-                        />
+                    <View style={{ marginBottom: 20 }}>
+                        <View style={styles.inputWrapper}>
+                            <FontAwesome6 name="indian-rupee-sign" size={18} color={commonStyles.mainColor} style={styles.leftIcon} />
+                            <View style={{ height: 20, backgroundColor: '#7D7D7D', width: 1, position: 'absolute', left: 27, top: 14 }} />
+                            <TextInput
+                                placeholder="Amount"
+                                keyboardType="numeric"
+                                value={amount}
+                                // onChangeText={setAmount}
+                                onChangeText={(text) => {
+                                    setAmount(text);
+                                    if (errors.amount) setErrors(prev => ({ ...prev, amount: '' }));
+                                }}
+                                style={[styles.input, { paddingLeft: 35 }]}
+                                placeholderTextColor="#7D7D7D"
+                            />
+                        </View>
+                        {errors.amount && <Text style={{ color: 'red', marginTop: 4 }}>{errors.amount}</Text>}
                     </View>
 
                     {/* Business Type */}
@@ -281,7 +306,7 @@ const styles = StyleSheet.create({
     },
     inputWrapper: {
         position: 'relative',
-        marginBottom: 20,
+        // marginBottom: 20,
     },
     input: {
         borderWidth: 1,

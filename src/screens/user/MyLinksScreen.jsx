@@ -1,902 +1,5 @@
-// import React, { useState } from 'react';
-// import { View, Text, TextInput, ScrollView, TouchableOpacity, StyleSheet, Image } from 'react-native';
-// import Icon from 'react-native-vector-icons/Feather';
 
-// const linksData = [
-//   {
-//     label: 'Personal Website',
-//     icon: require('../../assets/bellIcon.png'),
-//     placeholder: 'www.rajianani.com',
-//   },
-//   {
-//     label: 'LinkedIn',
-//     icon: require('../../assets/bellIcon.png'),
-//     placeholder: 'linkedin.com/in/rajianani',
-//   },
-//   {
-//     label: 'Facebook',
-//     icon: require('../../assets/bellIcon.png'),
-//     placeholder: 'facebook.com/rajianani.official',
-//   },
-//   {
-//     label: 'Instagram',
-//     icon: require('../../assets/bellIcon.png'),
-//     placeholder: 'instagram.com/rajianani',
-//   },
-//   {
-//     label: 'Twitter/X',
-//     icon: require('../../assets/bellIcon.png'),
-//     placeholder: 'twitter.com/rajianani',
-//   },
-//   {
-//     label: 'YouTube',
-//     icon: require('../../assets/bellIcon.png'),
-//     placeholder: 'youtube.com/@rajianani',
-//   },
-// ];
-
-// export default function MyLinksScreen() {
-//   const [customLinks, setCustomLinks] = useState([]);
-//   const [links, setLinks] = useState(linksData);
-
-//   const handleAddCustomLink = () => {
-//     setCustomLinks([...customLinks, { label: '', url: '' }]);
-//   };
-
-//   const handleCustomChange = (index, value) => {
-//     const newLinks = [...customLinks];
-//     newLinks[index].url = value;
-//     setCustomLinks(newLinks);
-//   };
-
-//   return (
-//     <View style={styles.container}>
-//       <Text style={styles.title}>My Links</Text>
-//       <ScrollView contentContainerStyle={styles.scrollContent}>
-//         {links.map((item, index) => (
-//           <View key={index} style={styles.linkBox}>
-//             <View style={styles.labelContainer}>
-//               <Image source={item.icon} style={styles.icon} />
-//               <Text style={styles.label}>{item.label}</Text>
-//             </View>
-//             <TextInput
-//               style={styles.input}
-//               placeholder={item.placeholder}
-//               defaultValue={item.placeholder}
-//             />
-//           </View>
-//         ))}
-
-//         {customLinks.map((item, index) => (
-//           <View key={index} style={styles.linkBox}>
-//             <Text style={styles.label}>Custom Label + URL Field</Text>
-//             <TextInput
-//               style={styles.input}
-//               placeholder="Enter custom URL"
-//               value={item.url}
-//               onChangeText={(value) => handleCustomChange(index, value)}
-//             />
-//           </View>
-//         ))}
-
-//         <TouchableOpacity onPress={handleAddCustomLink} style={styles.addNew}>
-//           <Icon name="link" size={16} color="#007aff" />
-//           <Text style={styles.addText}> [Add New +]</Text>
-//         </TouchableOpacity>
-
-//         <TouchableOpacity style={styles.updateButton}>
-//           <Text style={styles.updateText}>Update</Text>
-//         </TouchableOpacity>
-//       </ScrollView>
-//     </View>
-//   );
-// }
-
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     backgroundColor: '#fff',
-//   },
-//   scrollContent: {
-//     padding: 16,
-//     paddingBottom: 100,
-//   },
-//   title: {
-//     fontSize: 20,
-//     fontWeight: 'bold',
-//     marginTop: 16,
-//     textAlign: 'center',
-//   },
-//   linkBox: {
-//     marginTop: 16,
-//     borderColor: '#cfd8dc',
-//     borderWidth: 1,
-//     borderRadius: 10,
-//     padding: 12,
-//   },
-//   labelContainer: {
-//     flexDirection: 'row',
-//     alignItems: 'center',
-//     marginBottom: 6,
-//   },
-//   label: {
-//     fontSize: 14,
-//     fontWeight: '600',
-//     marginLeft: 6,
-//   },
-//   icon: {
-//     width: 20,
-//     height: 20,
-//     resizeMode: 'contain',
-//   },
-//   input: {
-//     borderColor: '#e0e0e0',
-//     borderWidth: 1,
-//     borderRadius: 6,
-//     padding: 10,
-//     fontSize: 14,
-//   },
-//   addNew: {
-//     flexDirection: 'row',
-//     alignItems: 'center',
-//     marginTop: 20,
-//     paddingLeft: 4,
-//   },
-//   addText: {
-//     color: '#007aff',
-//     fontSize: 14,
-//   },
-//   updateButton: {
-//     backgroundColor: '#003D91',
-//     padding: 14,
-//     marginTop: 30,
-//     borderRadius: 10,
-//     alignItems: 'center',
-//   },
-//   updateText: {
-//     color: '#fff',
-//     fontSize: 16,
-//     fontWeight: '600',
-//   },
-// });
-
-
-
-
-// import React, { useState } from 'react';
-// import {
-//   View,
-//   Text,
-//   TextInput,
-//   ScrollView,
-//   TouchableOpacity,
-//   StyleSheet,
-//   Image,
-// } from 'react-native';
-// import Icon from 'react-native-vector-icons/Feather';
-
-// const defaultLinks = [
-//   {
-//     label: 'Personal Website',
-//     // icon: require('./assets/web.png'),
-//     placeholder: 'www.rajianani.com',
-//   },
-//   {
-//     label: 'LinkedIn',
-//     // icon: require('./assets/linkedin.png'),
-//     placeholder: 'linkedin.com/in/rajianani',
-//   },
-//   {
-//     label: 'Facebook',
-//     // icon: require('./assets/facebook.png'),
-//     placeholder: 'facebook.com/rajianani.official',
-//   },
-//   {
-//     label: 'Instagram',
-//     // icon: require('./assets/instagram.png'),
-//     placeholder: 'instagram.com/rajianani',
-//   },
-//   {
-//     label: 'Twitter/X',
-//     // icon: require('./assets/twitterx.png'),
-//     placeholder: 'twitter.com/rajianani',
-//   },
-//   {
-//     label: 'YouTube',
-//     // icon: require('./assets/youtube.png'),
-//     placeholder: 'youtube.com/@rajianani',
-//   },
-// ];
-
-// const MyLinksScreen = () => {
-//   const [customLinks, setCustomLinks] = useState([]);
-//   const [links, setLinks] = useState(defaultLinks);
-
-//   const handleAddCustomLink = () => {
-//     setCustomLinks([...customLinks, { label: 'Custom Link', url: '' }]);
-//   };
-
-//   const handleCustomChange = (index, value) => {
-//     const updated = [...customLinks];
-//     updated[index].url = value;
-//     setCustomLinks(updated);
-//   };
-
-//   return (
-//     <View style={styles.container}>
-//       <Text style={styles.title}>My Links</Text>
-//       <ScrollView contentContainerStyle={styles.scroll}>
-//         {/* {[...links, ...customLinks].map((item, index) => (
-//           <View key={index} style={styles.card}>
-//             <View style={styles.labelRow}>
-//               {item.icon && (
-//                 <Image source={item.icon} style={styles.icon} />
-//               )}
-//               <Text style={styles.labelText}>{item.label}</Text>
-//             </View>
-//             <TextInput
-//               style={styles.input}
-//               placeholder="Enter URL"
-//               value={item.url || item.placeholder}
-//               onChangeText={(text) =>
-//                 item.placeholder
-//                   ? null
-//                   : handleCustomChange(index - links.length, text)
-//               }
-//               editable={!item.placeholder}
-//             />
-//           </View>
-//         ))} */}
-
-//         {customLinks.map((item, index) => (
-//   <View key={index} style={styles.card}>
-//     <View style={styles.labelRow}>
-//       <Icon name="link" size={20} color="#555" style={{ marginRight: 8 }} />
-//       <Text style={styles.labelText}>{item.label}</Text>
-//       <TouchableOpacity
-//         style={styles.deleteButton}
-//         onPress={() => {
-//           const updated = [...customLinks];
-//           updated.splice(index, 1);
-//           setCustomLinks(updated);
-//         }}
-//       >
-//         <Icon name="trash-2" size={18} color="#FF3B30" />
-//       </TouchableOpacity>
-//     </View>
-//     <TextInput
-//       style={styles.input}
-//       placeholder="Enter custom URL"
-//       value={item.url}
-//       onChangeText={(text) => handleCustomChange(index, text)}
-//     />
-//   </View>
-// ))}
-
-
-//         <TouchableOpacity style={styles.addButton} onPress={handleAddCustomLink}>
-//           <Icon name="plus-circle" size={18} color="#007AFF" />
-//           <Text style={styles.addText}> Add New</Text>
-//         </TouchableOpacity>
-
-//         <TouchableOpacity style={styles.updateButton}>
-//           <Text style={styles.updateText}>Update</Text>
-//         </TouchableOpacity>
-//       </ScrollView>
-//     </View>
-//   );
-// };
-
-// export default MyLinksScreen;
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     backgroundColor: '#f4f7fb',
-//   },
-//   scroll: {
-//     padding: 20,
-//     paddingBottom: 100,
-//   },
-//   title: {
-//     fontSize: 22,
-//     fontWeight: '700',
-//     textAlign: 'center',
-//     marginVertical: 16,
-//     color: '#1c1c1e',
-//   },
-//   card: {
-//     backgroundColor: '#fff',
-//     borderRadius: 12,
-//     padding: 16,
-//     marginBottom: 16,
-//     shadowColor: '#000',
-//     shadowOpacity: 0.05,
-//     shadowOffset: { width: 0, height: 4 },
-//     shadowRadius: 10,
-//     elevation: 2,
-//   },
-//   labelRow: {
-//     flexDirection: 'row',
-//     alignItems: 'center',
-//     marginBottom: 8,
-//   },
-//   icon: {
-//     width: 20,
-//     height: 20,
-//     resizeMode: 'contain',
-//     marginRight: 8,
-//   },
-//   labelText: {
-//     fontSize: 14,
-//     fontWeight: '600',
-//     color: '#333',
-//   },
-//   input: {
-//     backgroundColor: '#f0f2f5',
-//     padding: 12,
-//     borderRadius: 8,
-//     fontSize: 14,
-//     color: '#333',
-//   },
-//   addButton: {
-//     flexDirection: 'row',
-//     alignItems: 'center',
-//     marginTop: 10,
-//     marginBottom: 30,
-//   },
-//   addText: {
-//     fontSize: 14,
-//     color: '#007AFF',
-//     fontWeight: '500',
-//     marginLeft: 4,
-//   },
-//   updateButton: {
-//     backgroundColor: '#003D91',
-//     paddingVertical: 14,
-//     borderRadius: 10,
-//     alignItems: 'center',
-//   },
-//   updateText: {
-//     color: '#fff',
-//     fontSize: 16,
-//     fontWeight: '600',
-//   },
-//   deleteButton: {
-//   marginLeft: 'auto',
-//   padding: 4,
-// },
-
-// });
-
-
-// import React, { useState } from 'react';
-// import {
-//   View,
-//   Text,
-//   TextInput,
-//   ScrollView,
-//   TouchableOpacity,
-//   StyleSheet,
-//   Image,
-// } from 'react-native';
-// import Icon from 'react-native-vector-icons/Feather';
-
-// const defaultLinks = [
-//   {
-//     label: 'Personal Website',
-//     icon: require('../../assets/bellIcon.png'),
-//     placeholder: 'www.rajianani.com',
-//   },
-//   {
-//     label: 'LinkedIn',
-//     // icon: require('./assets/linkedin.png'),
-//     placeholder: 'linkedin.com/in/rajianani',
-//   },
-//   {
-//     label: 'Facebook',
-//     // icon: require('./assets/facebook.png'),
-//     placeholder: 'facebook.com/rajianani.official',
-//   },
-//   {
-//     label: 'Instagram',
-//     // icon: require('./assets/instagram.png'),
-//     placeholder: 'instagram.com/rajianani',
-//   },
-//   {
-//     label: 'Twitter/X',
-//     // icon: require('./assets/twitterx.png'),
-//     placeholder: 'twitter.com/rajianani',
-//   },
-//   {
-//     label: 'YouTube',
-//     // icon: require('./assets/youtube.png'),
-//     placeholder: 'youtube.com/@rajianani',
-//   },
-// ];
-
-// const MyLinksScreen = () => {
-//   const [customLinks, setCustomLinks] = useState([]);
-//   const [links] = useState(defaultLinks);
-
-//   const handleAddCustomLink = () => {
-//     setCustomLinks([...customLinks, { label: 'Custom Link', url: '' }]);
-//   };
-
-//   const handleCustomChange = (index, value) => {
-//     const updated = [...customLinks];
-//     updated[index].url = value;
-//     setCustomLinks(updated);
-//   };
-
-//   const handleDeleteCustomLink = (index) => {
-//     const updated = [...customLinks];
-//     updated.splice(index, 1);
-//     setCustomLinks(updated);
-//   };
-
-//   return (
-//     <View style={styles.container}>
-//       <Text style={styles.title}>My Links</Text>
-//       <ScrollView contentContainerStyle={styles.scroll}>
-//         {links.map((item, index) => (
-//           <View key={index} style={styles.card}>
-//             <View style={styles.labelRow}>
-//               <Image source={item.icon} style={styles.icon} />
-//               <Text style={styles.labelText}>{item.label}</Text>
-//             </View>
-//             <TextInput
-//               style={styles.input}
-//               value={item.placeholder}
-//               // editable={false}
-//             />
-//           </View>
-//         ))}
-
-//         {customLinks.map((item, index) => (
-//           <View key={index} style={styles.card}>
-//             <View style={styles.labelRow}>
-//               <Icon name="link" size={20} color="#555" style={{ marginRight: 8 }} />
-//               <Text style={styles.labelText}>{item.label}</Text>
-//               <TouchableOpacity
-//                 style={styles.deleteButton}
-//                 onPress={() => handleDeleteCustomLink(index)}
-//               >
-//                 <Icon name="trash-2" size={18} color="#FF3B30" />
-//               </TouchableOpacity>
-//             </View>
-//             <TextInput
-//               style={styles.input}
-//               placeholder="Enter custom URL"
-//               value={item.url}
-//               onChangeText={(text) => handleCustomChange(index, text)}
-//             />
-//           </View>
-//         ))}
-
-//         <TouchableOpacity style={styles.addButton} onPress={handleAddCustomLink}>
-//           <Icon name="plus-circle" size={18} color="#007AFF" />
-//           <Text style={styles.addText}> Add New</Text>
-//         </TouchableOpacity>
-
-//         <TouchableOpacity style={styles.updateButton}>
-//           <Text style={styles.updateText}>Update</Text>
-//         </TouchableOpacity>
-//       </ScrollView>
-//     </View>
-//   );
-// };
-
-// export default MyLinksScreen;
-
-
-
-
-
-// import React, { useState } from 'react';
-// import {
-//   View,
-//   Text,
-//   TextInput,
-//   ScrollView,
-//   TouchableOpacity,
-//   StyleSheet,
-//   Image,
-// } from 'react-native';
-// import Icon from 'react-native-vector-icons/Feather';
-
-// const defaultLinks = [
-//   {
-//     label: 'Personal Website',
-//     icon: require('../../assets/bellIcon.png'),
-//     placeholder: 'www.rajianani.com',
-//   },
-//   {
-//     label: 'LinkedIn',
-//     // icon: require('./assets/linkedin.png'),
-//     placeholder: 'linkedin.com/in/rajianani',
-//   },
-//   {
-//     label: 'Facebook',
-//     // icon: require('./assets/facebook.png'),
-//     placeholder: 'facebook.com/rajianani.official',
-//   },
-//   {
-//     label: 'Instagram',
-//     // icon: require('./assets/instagram.png'),
-//     placeholder: 'instagram.com/rajianani',
-//   },
-//   {
-//     label: 'Twitter/X',
-//     // icon: require('./assets/twitterx.png'),
-//     placeholder: 'twitter.com/rajianani',
-//   },
-//   {
-//     label: 'YouTube',
-//     // icon: require('./assets/youtube.png'),
-//     placeholder: 'youtube.com/@rajianani',
-//   },
-// ];
-
-// // ✅ Function to extract domain from URL and make it readable
-// const getLabelFromUrl = (url) => {
-//   try {
-//     const hostname = new URL(url).hostname;
-//     const parts = hostname.replace('www.', '').split('.');
-//     return parts[0].charAt(0).toUpperCase() + parts[0].slice(1); // e.g., "youtube"
-//   } catch (err) {
-//     return 'Custom Link';
-//   }
-// };
-
-// const MyLinksScreen = () => {
-//   const [customLinks, setCustomLinks] = useState([]);
-//   const [links] = useState(defaultLinks);
-
-//   const handleAddCustomLink = () => {
-//     setCustomLinks([...customLinks, { label: 'Custom Link', url: '' }]);
-//   };
-
-//   const handleCustomChange = (index, value) => {
-//     const updated = [...customLinks];
-//     updated[index].url = value;
-
-//     const labelFromUrl = getLabelFromUrl(value);
-//     updated[index].label = labelFromUrl;
-
-//     setCustomLinks(updated);
-//   };
-
-//   const handleDeleteCustomLink = (index) => {
-//     const updated = [...customLinks];
-//     updated.splice(index, 1);
-//     setCustomLinks(updated);
-//   };
-
-//   return (
-//     <View style={styles.container}>
-//       <Text style={styles.title}>My Links</Text>
-//       <ScrollView contentContainerStyle={styles.scroll}>
-//         {links.map((item, index) => (
-//           <View key={index} style={styles.card}>
-//             <View style={styles.labelRow}>
-//               <Image source={item.icon} style={styles.icon} />
-//               <Text style={styles.labelText}>{item.label}</Text>
-//             </View>
-//             <TextInput
-//               style={styles.input}
-//               value={item.placeholder}
-//               editable={false}
-//             />
-//           </View>
-//         ))}
-
-//         {customLinks.map((item, index) => (
-//           <View key={index} style={styles.card}>
-//             <View style={styles.labelRow}>
-//               <Icon name="link" size={20} color="#555" style={{ marginRight: 8 }} />
-//               <Text style={styles.labelText}>{item.label}</Text>
-//               <TouchableOpacity
-//                 style={styles.deleteButton}
-//                 onPress={() => handleDeleteCustomLink(index)}
-//               >
-//                 <Icon name="trash-2" size={18} color="#FF3B30" />
-//               </TouchableOpacity>
-//             </View>
-//             <TextInput
-//               style={styles.input}
-//               placeholder="Enter custom URL"
-//               value={item.url}
-//               onChangeText={(text) => handleCustomChange(index, text)}
-//             />
-//           </View>
-//         ))}
-
-//         <TouchableOpacity style={styles.addButton} onPress={handleAddCustomLink}>
-//           <Icon name="plus-circle" size={18} color="#007AFF" />
-//           <Text style={styles.addText}> Add New</Text>
-//         </TouchableOpacity>
-
-//         <TouchableOpacity style={styles.updateButton}>
-//           <Text style={styles.updateText}>Update</Text>
-//         </TouchableOpacity>
-//       </ScrollView>
-//     </View>
-//   );
-// };
-
-// export default MyLinksScreen;
-
-
-
-
-
-// import React, { useState } from 'react';
-// import {
-//   View,
-//   Text,
-//   TextInput,
-//   ScrollView,
-//   TouchableOpacity,
-//   StyleSheet,
-//   Image,
-// } from 'react-native';
-// import Icon from 'react-native-vector-icons/Feather';
-
-// const defaultLinks = [
-//   // {
-//   //   label: 'Personal Website',
-//   //   icon: require('../../assets/bellIcon.png'),
-//   //   placeholder: 'www.rajianani.com',
-//   // },
-//   {
-//     label: 'LinkedIn',
-//     // icon: require('./assets/linkedin.png'),
-//     placeholder: 'linkedin.com/in/rajianani',
-//   },
-//   {
-//     label: 'Facebook',
-//     // icon: require('./assets/facebook.png'),
-//     placeholder: 'facebook.com/rajianani.official',
-//   },
-//   {
-//     label: 'Instagram',
-//     // icon: require('./assets/instagram.png'),
-//     placeholder: 'instagram.com/rajianani',
-//   },
-//   {
-//     label: 'Twitter/X',
-//     // icon: require('./assets/twitterx.png'),
-//     placeholder: 'twitter.com/rajianani',
-//   },
-//   {
-//     label: 'YouTube',
-//     // icon: require('./assets/youtube.png'),
-//     placeholder: 'youtube.com/@rajianani',
-//   },
-// ];
-
-// // ✅ Extract domain name from URL
-// const getLabelFromUrl = (url) => {
-//   try {
-//     const hostname = new URL(url).hostname.replace('www.', '');
-//     const name = hostname.split('.')[0];
-//     return name.charAt(0).toUpperCase() + name.slice(1);
-//   } catch {
-//     return 'Custom Link';
-//   }
-// };
-
-// const MyLinksScreen = () => {
-//   const [customLinks, setCustomLinks] = useState([]);
-
-//   //This is for update / submit
-//   const handleAddCustomLink = () => {
-//     setCustomLinks([...customLinks, { id: Date.now(), label: 'Custom Link', url: '' }]);
-//   };
-
-//   const handleCustomChange = (index, url) => {
-//     const updatedLinks = [...customLinks];
-//     updatedLinks[index] = {
-//       ...updatedLinks[index],
-//       url,
-//       label: getLabelFromUrl(url),
-//     };
-//     setCustomLinks(updatedLinks);
-//   };
-
-//   //This is for  remove customized links
-
-//   const handleDeleteCustomLink = (index) => {
-//     const updatedLinks = [...customLinks];
-//     updatedLinks.splice(index, 1);
-//     setCustomLinks(updatedLinks);
-//   };
-
-//   const handleSubmit = () => {
-//     const defaultLinkData = defaultLinks.map((item) => ({
-//       label: item.label,
-//       url: item.placeholder,
-//       type: 'default',
-//     }));
-
-//     const customLinkData = customLinks.map((item) => ({
-//       label: item.label,
-//       url: item.url,
-//       type: 'custom',
-//     }));
-
-//     const finalData = [...defaultLinkData, ...customLinkData];
-
-//     console.log('Submitted Links:', finalData);
-//   };
-
-
-
-//   return (
-//     <View style={styles.container}>
-//       <View style={styles.header}>
-//         <TouchableOpacity onPress={() => { navigation.goBack() }}>
-//           <Icon name='arrow-left' size={24} color={'#0A1F3C'} />
-//         </TouchableOpacity>
-//         <Text style={styles.headerLabel}>Member Profile</Text>
-//       </View>
-//       <View style={styles.hr} />
-//       {/* <Text style={styles.title}>My Links</Text> */}
-//       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-//         {defaultLinks.map((item, index) => (
-//           <View key={index} style={styles.card}>
-//             <View style={styles.labelRow}>
-//               <Image source={item.icon} style={styles.icon} />
-//               <Text style={styles.labelText}>{item.label}</Text>
-//             </View>
-//             <TextInput
-//               style={styles.input}
-//               value={item.placeholder}
-//               editable={false}
-//             />
-//           </View>
-//         ))}
-
-//         {customLinks.map((item, index) => (
-//           <View key={item.id} style={styles.card}>
-//             <View style={styles.labelRow}>
-//               <Icon name="link" size={20} color="#555" style={{ marginRight: 8 }} />
-//               <Text style={styles.labelText}>{item.label}</Text>
-//               <TouchableOpacity
-//                 style={styles.deleteButton}
-//                 onPress={() => handleDeleteCustomLink(index)}
-//               >
-//                 <Icon name="trash-2" size={18} color="#FF3B30" />
-//               </TouchableOpacity>
-//             </View>
-//             <TextInput
-//               style={styles.input}
-//               placeholder="Enter custom URL"
-//               value={item.url}
-//               onChangeText={(text) => handleCustomChange(index, text)}
-//             />
-//           </View>
-//         ))}
-
-//         <TouchableOpacity style={styles.addButton} onPress={handleAddCustomLink}>
-//           <Icon name="plus-circle" size={18} color="#007AFF" />
-//           <Text style={styles.addText}> Add New</Text>
-//         </TouchableOpacity>
-
-//         <TouchableOpacity style={styles.updateButton} onPress={handleSubmit}>
-//           <Text style={styles.updateText}>Update</Text>
-//         </TouchableOpacity>
-//       </ScrollView>
-//     </View>
-//   );
-// };
-
-// export default MyLinksScreen;
-
-
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     backgroundColor: '#fff',
-//   },
-//   scroll: {
-//     padding: 16,
-//     paddingBottom: 30,
-//   },
-//   title: {
-//     fontSize: 22,
-//     fontWeight: '700',
-//     textAlign: 'center',
-//     marginVertical: 16,
-//     color: '#1c1c1e',
-//   },
-//   card: {
-//     backgroundColor: '#fff',
-//     borderRadius: 12,
-//     padding: 16,
-//     marginBottom: 16,
-//     shadowColor: '#000',
-//     shadowOpacity: 0.05,
-//     shadowOffset: { width: 0, height: 4 },
-//     shadowRadius: 10,
-//     elevation: 2,
-//   },
-//   labelRow: {
-//     flexDirection: 'row',
-//     alignItems: 'center',
-//     marginBottom: 8,
-//   },
-//   icon: {
-//     width: 20,
-//     height: 20,
-//     resizeMode: 'contain',
-//     marginRight: 8,
-//   },
-//   labelText: {
-//     fontSize: 14,
-//     fontWeight: '600',
-//     color: '#333',
-//   },
-//   input: {
-//     backgroundColor: '#f0f2f5',
-//     padding: 12,
-//     borderRadius: 8,
-//     fontSize: 14,
-//     color: '#333',
-//   },
-//   deleteButton: {
-//     marginLeft: 'auto',
-//     padding: 4,
-//   },
-//   addButton: {
-//     flexDirection: 'row',
-//     alignItems: 'center',
-//     marginTop: 10,
-//     marginBottom: 30,
-//   },
-//   addText: {
-//     fontSize: 14,
-//     color: '#007AFF',
-//     fontWeight: '500',
-//     marginLeft: 4,
-//   },
-//   updateButton: {
-//     backgroundColor: '#003D91',
-//     paddingVertical: 14,
-//     borderRadius: 10,
-//     alignItems: 'center',
-//   },
-//   updateText: {
-//     color: '#fff',
-//     fontSize: 16,
-//     fontWeight: '600',
-//   },
-//   header: {
-//     // flex:1,
-//     justifyContent: 'space-between',
-//     flexDirection: 'row',
-//     padding: 16,
-//     alignItems: 'center'
-//   },
-//   headerLabel: {
-//     fontSize: 18,
-//     fontWeight: "600",
-//     color: "#0A1F3C",
-//     flex: 1,
-//     textAlign: 'center'
-//   },
-//   hr: {
-//     height: 0.5,
-//     backgroundColor: "#7D7D7D",
-//   },
-// });
-
-
-
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -904,34 +7,18 @@ import {
   ScrollView,
   TouchableOpacity,
   StyleSheet,
-  Image,
+  Alert,
+  Modal,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
+import { useSelector } from 'react-redux';
+import api from '../../utils/api';
+import { useFocusEffect } from '@react-navigation/native';
+import Toast from 'react-native-toast-message';
+import Loader from '../../components/loader';
+import commonStyles from '../../commonstyles/CommonStyles';
 
-const defaultLinks = [
-  {
-    label: 'LinkedIn',
-    placeholder: 'linkedin.com/in/rajianani',
-  },
-  {
-    label: 'Facebook',
-    placeholder: 'facebook.com/rajianani.official',
-  },
-  {
-    label: 'Instagram',
-    placeholder: 'instagram.com/rajianani',
-  },
-  {
-    label: 'Twitter/X',
-    placeholder: 'twitter.com/rajianani',
-  },
-  {
-    label: 'YouTube',
-    placeholder: 'youtube.com/@rajianani',
-  },
-];
-
-// ✅ Extract domain name from URL
+// Extract domain name from URL as fallback label
 const getLabelFromUrl = (url) => {
   try {
     const hostname = new URL(url).hostname.replace('www.', '');
@@ -943,85 +30,223 @@ const getLabelFromUrl = (url) => {
 };
 
 const MyLinksScreen = ({ navigation }) => {
-  const [customLinks, setCustomLinks] = useState([]);
+  const [links, setLinks] = useState([]);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalMode, setModalMode] = useState('add'); // 'add', 'edit', or 'delete'
+  const [modalLink, setModalLink] = useState({ label: '', url: '', platform_id: null, index: null });
+  const [modalErrors, setModalErrors] = useState({});
+  const { userId } = useSelector(state => state.Auth);
+  const [loading, setLoading] = useState(false);
+
+  useFocusEffect(
+    useCallback(() => {
+      const getALLLinks = async () => {
+        try {
+          setLoading(true);
+          const resp = await api.post('getsocialmedialinks', { user_id: userId });
+          const data = resp.data.data || [];
+          console.log(data, 'Fetched links data');
+          const formattedLinks = data.map(link => ({
+            id: link.id,
+            platform_id: link.id,
+            label: link.platform_name,
+            url: link.platform_url,
+            type: 'custom', // Treat all fetched links as custom for simplicity
+          }));
+          setLinks(formattedLinks);
+        } catch (error) {
+          console.log('Error fetching links:', error);
+          Alert.alert('Error', 'Failed to fetch links');
+        }finally{
+          setLoading(false);
+        }
+      };
+      getALLLinks();
+    }, [userId])
+  );
 
   const handleAddCustomLink = () => {
-    setCustomLinks([...customLinks, { id: Date.now(), label: 'Custom Link', url: '' }]);
+    setModalLink({ label: '', url: '', platform_id: null, index: null });
+    setModalMode('add');
+    setModalErrors({});
+    setModalVisible(true);
   };
 
-  const handleCustomChange = (index, url) => {
-    const updatedLinks = [...customLinks];
-    updatedLinks[index] = {
-      ...updatedLinks[index],
-      url,
-      label: getLabelFromUrl(url),
-    };
-    setCustomLinks(updatedLinks);
+  const handleEditLink = (index) => {
+    const link = links[index];
+    setModalLink({ ...link, index });
+    setModalMode('edit');
+    setModalErrors({});
+    setModalVisible(true);
   };
 
-  const handleDeleteCustomLink = (index) => {
-    const updatedLinks = [...customLinks];
-    updatedLinks.splice(index, 1);
-    setCustomLinks(updatedLinks);
+  const handleDeleteLink = (index) => {
+    const link = links[index];
+    setModalLink({ ...link, index });
+    setModalMode('delete');
+    setModalErrors({});
+    setModalVisible(true);
   };
 
-  const handleSubmit = () => {
-    const defaultLinkData = defaultLinks.map((item) => ({
-      label: item.label,
-      url: item.placeholder,
-      type: 'default',
-    }));
-
-    const customLinkData = customLinks.map((item) => ({
-      label: item.label,
-      url: item.url,
-      type: 'custom',
-    }));
-
-    const finalData = [...defaultLinkData, ...customLinkData];
-    console.log('Submitted Links:', finalData);
+  const handleModalChange = (field, value) => {
+    setModalLink({ ...modalLink, [field]: value });
+    if (modalErrors[field]) {
+      setModalErrors({ ...modalErrors, [field]: null });
+    }
   };
+
+  const validateModal = () => {
+    const newErrors = {};
+    const urlRegex = /^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w-./?%&=]*)?$/i;
+
+    if (!modalLink.label.trim()) {
+      newErrors.label = 'Platform name is required';
+    }
+    if (!modalLink.url.trim()) {
+      newErrors.url = 'URL is required';
+    } else if (!urlRegex.test(modalLink.url)) {
+      newErrors.url = 'Please enter a valid URL';
+    }
+
+    setModalErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleModalSubmit = async () => {
+    if (modalMode === 'delete') return;
+    if (!validateModal()) return;
+
+    try {
+      const submissionData = {
+        platform_name: modalLink.label || getLabelFromUrl(modalLink.url) || 'Custom Link',
+        platform_url: modalLink.url,
+        rmb_user_id: userId,
+        ...(modalMode === 'edit' && modalLink.platform_id ? { platform_id: modalLink.platform_id } : {}),
+      };
+
+      const apiEndpoint = modalMode === 'edit' ? 'update_rmb_customer_social_media' : 'post_rmb_customer_social_media';
+      const resp = await api.post(apiEndpoint, submissionData);
+      console.log(submissionData, 'Link submission data');
+
+      const { index } = modalLink;
+      const newLink = {
+        id: resp.data.id || Date.now(),
+        platform_id: resp.data.platform_id || modalLink.platform_id || Date.now(),
+        label: modalLink.label || getLabelFromUrl(modalLink.url) || 'Custom Link',
+        url: modalLink.url,
+        type: 'custom',
+      };
+
+      if (index !== null) {
+        const updatedLinks = [...links];
+        updatedLinks[index] = newLink;
+        setLinks(updatedLinks);
+      } else {
+        setLinks([...links, newLink]);
+      }
+
+      setModalVisible(false);
+      Toast.show({
+        type: 'success',
+        text1: 'Success',
+        text2: modalMode === 'edit' ? 'Link updated successfully' : 'Link added successfully',
+        position: 'top',
+        visibilityTime: 3000,
+      });
+      //Alert.alert('Success', modalMode === 'edit' ? 'Link updated successfully' : 'Link added successfully');
+    } catch (error) {
+      console.log(`Error ${modalMode === 'edit' ? 'updating' : 'adding'} link:`, error);
+      Alert.alert('Error', `Failed to ${modalMode === 'edit' ? 'update' : 'add'} link`);
+    }
+  };
+
+  const handleModalDelete = async () => {
+    if (modalMode !== 'delete') return;
+
+    try {
+      if (modalLink.platform_id) {
+        // const data={
+        //    platform_id: modalLink.platform_id,
+        //   rmb_user_id: userId,
+        // }
+        // console.log(data, 'Delete link data');
+        // return
+        await api.post('delete_rmb_customer_social_media', {
+          platform_id: modalLink.platform_id,
+          rmb_user_id: userId,
+        });
+      }
+
+      const updatedLinks = [...links];
+      updatedLinks.splice(modalLink.index, 1);
+      setLinks(updatedLinks);
+
+      setModalVisible(false);
+      // Alert.alert('Success', 'Link deleted successfully');
+      Toast.show({
+        type: 'success',
+        text1: 'Success',
+        text2: 'Link deleted successfully',
+        position: 'top',
+        visibilityTime: 3000,
+      });
+    } catch (error) {
+      console.log('Error deleting link:', error);
+      Alert.alert('Error', 'Failed to delete link');
+    }
+  };
+
+  const handleSubmit = async () => {
+    try {
+      for (const link of links) {
+        const submissionData = {
+          platform_name: link.label || getLabelFromUrl(link.url) || 'Link',
+          platform_url: link.url,
+          rmb_user_id: userId,
+          ...(link.platform_id ? { platform_id: link.platform_id } : {}),
+        };
+        await api.post('post_rmb_customer_social_media', submissionData);
+      }
+      Alert.alert('Success', 'Links updated successfully');
+      navigation.goBack();
+    } catch (error) {
+      console.log('Error submitting links:', error);
+      Alert.alert('Error', 'Failed to update links');
+    }
+  };
+
+  if(loading){
+    return(
+      <Loader size='large' color={commonStyles.mainColor} style={{ flex: 1 }} />
+    )
+  }
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation?.goBack()}>
-          <Icon name='arrow-left' size={24} color={'#0A1F3C'} />
+          <Icon name="arrow-left" size={24} color={'#0A1F3C'} />
         </TouchableOpacity>
         <Text style={styles.headerLabel}>My Links</Text>
       </View>
       <View style={styles.hr} />
 
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        {defaultLinks.map((item, index) => (
-          <View key={index} style={styles.card}>
-            <View style={styles.labelRow}>
-              <Icon name="link" size={20} color="#666" style={{ marginRight: 8 }} />
-              <Text style={styles.labelText}>{item.label}</Text>
-            </View>
-            <TextInput
-              style={styles.input}
-              value={item.placeholder}
-              editable={false}
-            />
-          </View>
-        ))}
-
-        {customLinks.map((item, index) => (
+        {links.map((item, index) => (
           <View key={item.id} style={styles.card}>
             <View style={styles.labelRow}>
               <Icon name="link" size={20} color="#555" style={{ marginRight: 8 }} />
-              <Text style={styles.labelText}>{item.label}</Text>
-              <TouchableOpacity style={styles.deleteButton} onPress={() => handleDeleteCustomLink(index)}>
-                <Icon name="trash-2" size={18} color="#FF3B30" />
-              </TouchableOpacity>
+              <Text style={styles.labelText}>{item.label || getLabelFromUrl(item.url) || 'Custom Link'}</Text>
+              <View style={styles.iconRow}>
+                <TouchableOpacity style={styles.editButton} onPress={() => handleEditLink(index)}>
+                  <Icon name="edit" size={18} color="#007AFF" />
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.deleteButton} onPress={() => handleDeleteLink(index)}>
+                  <Icon name="trash-2" size={18} color="#FF3B30" />
+                </TouchableOpacity>
+              </View>
             </View>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter custom URL"
-              value={item.url}
-              onChangeText={(text) => handleCustomChange(index, text)}
-            />
+            <Text style={styles.urlText}>{item.url}</Text>
           </View>
         ))}
 
@@ -1034,6 +259,72 @@ const MyLinksScreen = ({ navigation }) => {
           <Text style={styles.updateText}>Update</Text>
         </TouchableOpacity>
       </ScrollView>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            {modalMode === 'delete' ? (
+              <>
+                <Text style={styles.modalTitle}>Delete Link</Text>
+                <Text style={styles.modalMessage}>
+                  Are you sure you want to delete the link "{modalLink.label || getLabelFromUrl(modalLink.url) || 'Custom Link'}"?
+                </Text>
+                <View style={styles.modalButtonContainer}>
+                  <TouchableOpacity
+                    style={[styles.modalButton, styles.cancelButton]}
+                    onPress={() => setModalVisible(false)}
+                  >
+                    <Text style={styles.modalButtonText}>Cancel</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={[styles.modalButton, styles.deleteButtonModal]} onPress={handleModalDelete}>
+                    <Text style={styles.modalButtonText}>Delete</Text>
+                  </TouchableOpacity>
+                </View>
+              </>
+            ) : (
+              <>
+                <Text style={styles.modalTitle}>{modalMode === 'edit' ? 'Edit Link' : 'Add New Link'}</Text>
+                <View style={styles.modalInputContainer}>
+                  <Text style={styles.label}>Platform Name</Text>
+                  <TextInput
+                    style={[styles.input, modalErrors.label && styles.inputError]}
+                    placeholder="Enter platform name"
+                    value={modalLink.label}
+                    onChangeText={(text) => handleModalChange('label', text)}
+                  />
+                  {modalErrors.label && <Text style={styles.errorText}>{modalErrors.label}</Text>}
+                </View>
+                <View style={styles.modalInputContainer}>
+                  <Text style={styles.label}>Link URL</Text>
+                  <TextInput
+                    style={[styles.input, modalErrors.url && styles.inputError]}
+                    placeholder="Enter URL"
+                    value={modalLink.url}
+                    onChangeText={(text) => handleModalChange('url', text)}
+                  />
+                  {modalErrors.url && <Text style={styles.errorText}>{modalErrors.url}</Text>}
+                </View>
+                <View style={styles.modalButtonContainer}>
+                  <TouchableOpacity
+                    style={[styles.modalButton, styles.cancelButton]}
+                    onPress={() => setModalVisible(false)}
+                  >
+                    <Text style={styles.modalButtonText}>Cancel</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.modalButton} onPress={handleModalSubmit}>
+                    <Text style={styles.modalButtonText}>Submit</Text>
+                  </TouchableOpacity>
+                </View>
+              </>
+            )}
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -1068,11 +359,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: 10,
   },
-  icon: {
-    width: 20,
-    height: 20,
-    resizeMode: 'contain',
-    marginRight: 8,
+  iconRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   labelText: {
     flex: 1,
@@ -1080,19 +369,26 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#0A1F3C',
   },
-  input: {
-    backgroundColor: '#F0F2F5',
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    borderRadius: 8,
+  urlText: {
     fontSize: 14,
     color: '#333',
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    backgroundColor: '#F0F2F5',
+    borderRadius: 8,
     borderWidth: 1,
     borderColor: '#DADDE1',
+  },
+  editButton: {
+    marginLeft: 8,
+    padding: 4,
   },
   deleteButton: {
     marginLeft: 8,
     padding: 4,
+  },
+  deleteButtonModal: {
+    backgroundColor: '#FF3B30',
   },
   addButton: {
     flexDirection: 'row',
@@ -1129,14 +425,88 @@ const styles = StyleSheet.create({
   },
   headerLabel: {
     fontSize: 18,
-    fontWeight: "600",
-    color: "#0A1F3C",
+    fontWeight: '600',
+    color: '#0A1F3C',
     flex: 1,
     textAlign: 'center',
     marginRight: 24,
   },
   hr: {
     height: 0.5,
-    backgroundColor: "#ccc",
+    backgroundColor: '#ccc',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 20,
+    width: '80%',
+    maxWidth: 400,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#0A1F3C',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  modalMessage: {
+    fontSize: 16,
+    color: '#333',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  modalInputContainer: {
+    marginBottom: 15,
+  },
+  label: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#333',
+    marginBottom: 4,
+  },
+  input: {
+    backgroundColor: '#F0F2F5',
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    borderRadius: 8,
+    fontSize: 14,
+    color: '#333',
+    borderWidth: 1,
+    borderColor: '#DADDE1',
+  },
+  inputError: {
+    borderColor: '#ff0000',
+  },
+  errorText: {
+    color: '#ff0000',
+    fontSize: 12,
+    marginTop: 4,
+  },
+  modalButtonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 20,
+  },
+  modalButton: {
+    flex: 1,
+    backgroundColor: '#003D91',
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginHorizontal: 5,
+  },
+  cancelButton: {
+    backgroundColor: '#FF3B30',
+  },
+  modalButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });

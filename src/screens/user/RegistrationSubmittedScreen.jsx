@@ -22,7 +22,7 @@ const RegistrationSubmittedScreen = ({ navigation, route }) => {
     setModalVisible(true);
   };
   const handleNavigation=()=>{
-                navigation.replace('LoginPage');
+                navigation.replace('ProfileCard');
   }
 
   return (

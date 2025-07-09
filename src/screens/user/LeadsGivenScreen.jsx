@@ -36,33 +36,15 @@ const LeadsGivenScreen = () => {
 
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedUser, setSelectedUser] = useState(null);
-    const [members] = useState([
-        { id: 1, name: 'John Doe' },
-        { id: 2, name: 'Jane Smith' },
-        { id: 3, name: 'Alice Johnson' },
-        { id: 4, name: 'Bob Williams' },
-        { id: 5, name: 'Rajiv' },
-        { id: 6, name: 'Sai Kumar' },
-        { id: 7, name: 'Rajive Chand' },
-        { id: 8, name: 'Rajeev' },
-        { id: 9, name: 'Rajiv Kakara' },
-        { id: 10, name: 'Rajivchand Kakara' },
-        // { id: 11, name: 'Mahesh3' },
-        // { id: 12, name: 'Maneesh' },
-        // { id: 13, name: 'MaheshBabu' },
-        // { id: 14, name: 'Mahesh gunana' },
-        // { id: 15, name: 'Mahesh5' },
-        // { id: 16, name: 'Mahesh7' },
-    ]); // Replace this with fetched data
+    const [allMembers, setAllMembers] = useState([]);
 
-    // const [members] = useState([
-    //     { id: 1, name: 'John Doe', phone: '9876543210', email: 'john@example.com', address: 'Hyderabad' },
-    //     { id: 2, name: 'Jane Smith', phone: '9123456789', email: 'jane@example.com', address: 'Bangalore' },
-    //     { id: 3, name: 'Alice Johnson', phone: '9988776655', email: 'alice@example.com', address: 'Chennai' },
-    //     { id: 4, name: 'Bob Williams', phone: '9871234567', email: 'bob@example.com', address: 'Mumbai' },
-    //     { id: 5, name: 'Suresh', phone: '9012345678', email: 'suresh@example.com', address: 'Delhi' },
-    //     { id: 6, name: 'Sai Kumar', phone: '9876501234', email: 'sai@example.com', address: 'Vizag' },
-    // ]);
+    const [errors, setErrors] = useState({
+        to: '',
+        name: '',
+        phone: '',
+        address: '',
+    });
+
 
     // const [userData,setUserData] = useState({id: 1, name: 'Rajiv Chand', phone: '8688883323', email: 'rajivchand@gmail.com', address: 'Rajamahendravarm'});
 
@@ -86,17 +68,31 @@ const LeadsGivenScreen = () => {
             const data = await resp.data.data || [];
             console.log(data[0], 'data')
             if (resp.data.status == 200) {
-                const filteredMembers = data?.filter(member =>
-                    member.rnb_customer_name?.toLowerCase().includes(searchQuery.toLowerCase())
-                );
+                setAllMembers(data); // store all
+                setFilteredMembers(data); // initially same
+                // const filteredMembers = data?.filter(member =>
+                //     member.rnb_customer_name?.toLowerCase().includes(searchQuery.toLowerCase())
+                // );
                 // console.log(filteredMembers, 'Members');
-                setFilteredMembers(filteredMembers);
+                // setFilteredMembers(filteredMembers);
             }
         } catch (error) {
             console.log('Error', error);
             Alert.alert(error)
         }
     }
+
+    useEffect(() => {
+        if (searchQuery.trim() === '') {
+            setFilteredMembers([]); // show nothing
+        } else {
+            const filtered = allMembers.filter(member =>
+                member.rnb_customer_name?.toLowerCase().includes(searchQuery.toLowerCase())
+            );
+            setFilteredMembers(filtered);
+        }
+    }, [searchQuery, allMembers]);
+
 
     // useEffect(() => {
     //     if (referralType === 'Inside' && selectedUser) {
@@ -113,13 +109,35 @@ const LeadsGivenScreen = () => {
     // }, [referralType, selectedUser]);
 
     const handleSubmit = async () => {
+        // if (!selectedUser) {
+        //     Alert.alert('Please select a user from the dropdown.');
+        //     return;
+        // }
+
+        let valid = true;
+        let newErrors = { to: '', name: '', phone: '', address: '' };
+
         if (!selectedUser) {
-            Alert.alert('Please select a user from the dropdown.');
-            return;
+            newErrors.to = 'Please select a user.';
+            valid = false;
         }
+        if (!referralName.trim()) {
+            newErrors.name = 'Please enter referral name.';
+            valid = false;
+        }
+        if (!telephone || !/^\d{10}$/.test(telephone)) {
+            newErrors.phone = 'Enter a valid 10-digit phone number.';
+            valid = false;
+        }
+        if (!address.trim()) {
+            newErrors.address = 'Please enter address.';
+            valid = false;
+        }
+        setErrors(newErrors);
+        if (!valid) return;
 
         const payload = {
-            user_id: 57,
+            user_id: userId,
             customer_id: selectedUser.id,
             customer_name: selectedUser?.rnb_customer_name,
             // referral_type: referralType,
@@ -191,9 +209,9 @@ const LeadsGivenScreen = () => {
                             // }}
                             onChangeText={(text) => {
                                 setSearchQuery(text);
-                                if (text === '') {
-                                    setSelectedUser(null); // Clear selected user when search query is cleared
-                                }
+                                // if (text === '') {
+                                setSelectedUser(null); // Clear selected user when search query is cleared
+                                // }
                             }}
                             style={styles.input}
                             placeholderTextColor={commonStyles.mainColor}
@@ -211,7 +229,11 @@ const LeadsGivenScreen = () => {
                                             style={styles.dropdownItem}
                                             onPress={() => {
                                                 setSelectedUser(member);
-                                                setSearchQuery('');
+                                                // setSearchQuery('');
+                                                setSearchQuery(member.rnb_customer_name);
+                                                if (errors.to) {
+                                                    setErrors(prev => ({ ...prev, to: '' }));
+                                                }
                                             }}
                                         >
                                             <Text>{member.rnb_customer_name}</Text>
@@ -223,6 +245,8 @@ const LeadsGivenScreen = () => {
                             </ScrollView>
                         </View>
                     )}
+                    {errors.to ? <Text style={styles.errorText}>{errors.to}</Text> : null}
+
 
                     {/* Referral Type */}
                     {/* <Text style={styles.sectionLabel}>Referral Type</Text>
@@ -297,48 +321,75 @@ const LeadsGivenScreen = () => {
 
 
                     {/* Inputs */}
-                    <View style={[styles.inputIconWrapper, commonStyles.mt20]}>
-                        <Feather name="user" size={16} color={commonStyles.mainColor} />
-                        <TextInput
-                            placeholder="Referral Name"
-                            value={referralName}
-                            onChangeText={setReferralName}
-                            style={styles.textField}
-                            placeholderTextColor={commonStyles.lightColor}
-                        />
+                    <View style={[commonStyles.mt20, commonStyles.mb12]}>
+                        <View style={[styles.inputIconWrapper]}>
+                            <Feather name="user" size={16} color={commonStyles.mainColor} />
+                            <TextInput
+                                placeholder="Referral Name"
+                                value={referralName}
+                                // onChangeText={setReferralName}
+                                onChangeText={(text) => {
+                                    setReferralName(text);
+                                    if (errors.name) setErrors(prev => ({ ...prev, name: '' }));
+                                }}
+                                style={styles.textField}
+                                placeholderTextColor={commonStyles.lightColor}
+                            />
+                        </View>
+                        {errors.name ? <Text style={styles.errorText}>{errors.name}</Text> : null}
                     </View>
-                    <View style={styles.inputIconWrapper}>
-                        <Feather name="phone" size={16} color={commonStyles.mainColor} />
-                        <TextInput
-                            placeholder="Mobile Number"
-                            value={telephone}
-                            onChangeText={setTelephone}
-                            style={styles.textField}
-                            keyboardType='numeric'
-                            maxLength={10}
-                            placeholderTextColor={commonStyles.lightColor}
-                        />
+
+                    <View style={commonStyles.mb12}>
+                        <View style={styles.inputIconWrapper}>
+                            <Feather name="phone" size={16} color={commonStyles.mainColor} />
+                            <TextInput
+                                placeholder="Mobile Number"
+                                value={telephone}
+                                // onChangeText={setTelephone}
+                                onChangeText={(text) => {
+                                    setTelephone(text);
+                                    if (errors.phone) setErrors(prev => ({ ...prev, phone: '' }));
+                                }}
+                                style={styles.textField}
+                                keyboardType='numeric'
+                                maxLength={10}
+                                placeholderTextColor={commonStyles.lightColor}
+                            />
+                        </View>
+                        {errors.phone ? <Text style={styles.errorText}>{errors.phone}</Text> : null}
                     </View>
-                    <View style={styles.inputIconWrapper}>
-                        <MaterialIcons name="email" size={16} color={commonStyles.mainColor} />
-                        <TextInput
-                            placeholder="E-Mail"
-                            value={email}
-                            onChangeText={setEmail}
-                            style={styles.textField}
-                            placeholderTextColor={commonStyles.lightColor}
-                        />
+
+                    <View style={commonStyles.mb12}>
+                        <View style={styles.inputIconWrapper}>
+                            <MaterialIcons name="email" size={16} color={commonStyles.mainColor} />
+                            <TextInput
+                                placeholder="E-Mail"
+                                value={email}
+                                onChangeText={setEmail}
+                                style={styles.textField}
+                                placeholderTextColor={commonStyles.lightColor}
+                            />
+                        </View>
                     </View>
-                    <View style={styles.inputIconWrapper}>
-                        <Feather name="map-pin" size={16} color={commonStyles.mainColor} />
-                        <TextInput
-                            placeholder="Address"
-                            value={address}
-                            onChangeText={setAddress}
-                            style={styles.textField}
-                            placeholderTextColor={commonStyles.lightColor}
-                        />
+
+                    <View style={commonStyles.mb12}>
+                        <View style={styles.inputIconWrapper}>
+                            <Feather name="map-pin" size={16} color={commonStyles.mainColor} />
+                            <TextInput
+                                placeholder="Address"
+                                value={address}
+                                // onChangeText={setAddress}
+                                onChangeText={(text) => {
+                                    setAddress(text);
+                                    if (errors.address) setErrors(prev => ({ ...prev, address: '' }));
+                                }}
+                                style={styles.textField}
+                                placeholderTextColor={commonStyles.lightColor}
+                            />
+                        </View>
+                        {errors.address ? <Text style={styles.errorText}>{errors.address}</Text> : null}
                     </View>
+
                     <View style={[styles.inputIconWrapper, { height: 80, alignItems: 'flex-start' }]}>
                         <Feather name="message-square" size={16} color={commonStyles.mainColor} style={{ marginTop: 12 }} />
                         <TextInput
@@ -460,7 +511,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderRadius: 8,
         paddingHorizontal: 10,
-        marginBottom: 12,
+        // marginBottom: 12,
         height: 45,
     },
     textField: {
@@ -636,7 +687,12 @@ const styles = StyleSheet.create({
         paddingVertical: 4,
         paddingHorizontal: 10,
     },
-
+    errorText: {
+        color: 'red',
+        fontSize: 12,
+        marginTop: 4,
+        marginBottom: 8,
+    },
 
 });
 

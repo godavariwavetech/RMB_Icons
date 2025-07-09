@@ -10,6 +10,7 @@ import { useSelector } from 'react-redux';
 import Loader from '../../components/loader';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import api from '../../utils/api';
+import { responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions';
 
 
 
@@ -21,7 +22,7 @@ const ProfileCard = () => {
     const [userDob, setUserDob] = useState('');
     const [userPhone, setUserPhone] = useState('');
     const [loading, setLoading] = useState(false);
-    const [attendancePercentage, setAttendancePercentage] = useState(76);
+    const [attendancePercentage, setAttendancePercentage] = useState(null);
     const [designation, setDesignation] = useState('');
     const [companyName, setCompanyName] = useState('');
     const [refreshing, setRefreshing] = useState(false);
@@ -30,10 +31,20 @@ const ProfileCard = () => {
     const [meetingData, setMeetingData] = useState({});
     const [meetingLength,setMeetinglength] = useState([]);
     const [draggableMenuVisible, setDraggableMenuVisible] = useState(false);
+    const [homePageCounts,setHomePageCounts] = useState({});
+    const [attendanceData, setAttendanceData] = useState({});
     // const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
     // const ICON_SIZE = 56; // Total icon size with padding
     //     const pan = useRef(new Animated.ValueXY({ x: 300, y: 100 })).current; // default position
 
+     const onRefresh = useCallback(() => {
+        setRefreshing(true);
+        FetchedData();
+         getMeetings();
+        getHomePageCounts();
+        getAttendancePercentage()
+        setRefreshing(false);
+    }, []);
 
     //     const panResponder = useRef(
     //     PanResponder.create({
@@ -127,14 +138,32 @@ const ProfileCard = () => {
     ).current;
 
     console.log(userId, '>>>>>>>>>>>>>>>>>')
-    useEffect(() => {
-        FetchedData();
-         getMeetings()
-    }, []);
+    // useEffect(() => {
+    //     FetchedData();
+    //      getMeetings()
+    // }, []);
     useFocusEffect(useCallback(() => {
         FetchedData();
-        getMeetings()
-    }, []))
+        getMeetings();
+        getHomePageCounts();
+        getAttendancePercentage()
+    }, []));
+
+
+    const getAttendancePercentage = async()=>{
+        try {
+            const resp = await api.post('attendancepersentage',{"rmb_user_id":userId});
+            const data = await resp.data.data;
+            setAttendanceData(data);
+            console.log(data[0]?.attendance_percentage, 'Attendance Percentage');
+            setAttendancePercentage(data[0]?.attendance_percentage);
+            console.log(data, 'Attendance Percentage Data');
+        } catch (error) {
+            console.log('Error fetching attendance percentage:', error);
+            Alert.alert('Error', 'Failed to fetch attendance percentage');
+        }
+    }
+
 
     const FetchedData = async () => {
         try {
@@ -161,6 +190,22 @@ const ProfileCard = () => {
         }
     }
 
+    const getHomePageCounts = async () => {
+        try {
+            setLoading(true);
+            const resp = await api.post('gethomepagecounts', { "rmb_user_id": userId });
+            console.log(resp.data, 'Home Page Counts');
+            if (resp.data.status === 200) {
+                setHomePageCounts(resp.data.data[0]);
+            }
+        } catch (error) {
+            console.log('Error', error);
+            Alert.alert('Error', 'Failed to fetch home page counts');
+        } finally {
+            setLoading(false);
+        }
+    }
+
     const getMeetings = async () => {
         try {
             setLoading(true);
@@ -170,7 +215,7 @@ const ProfileCard = () => {
             const data = await resp.data.data[0];
             console.log(data, 'Meeting Data')
             if (resp.data.status == 200) {
-                setMeetingData(data)
+                setMeetingData(resp.data.data)
             }
         } catch (error) {
             console.log('Error', error)
@@ -225,26 +270,18 @@ function convertTo12Hour(time24) {
   return `${hour}:${minute} ${ampm}`;
 }
 
-    // const onRefresh = useCallback(() => {
-    //     setRefreshing(true);
-    //     FetchedData()
-    //     setRefreshing(false);
-    // }, []);
-
-
-
 
     return (
         <View style={styles.container}>
             <StatusBar barStyle="dark-content" backgroundColor="#fff" />
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 24 }}
-            // refreshControl={
-            //     <RefreshControl
-            //         refreshing={refreshing}
-            //         onRefresh={onRefresh}
-            //         colors={[commonStyles.mainColor]}
-            //     />
-            // }
+            refreshControl={
+                <RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={onRefresh}
+                    colors={[commonStyles.mainColor]}
+                />
+            }
             >
                 {/* Top Icons */}
                 <View style={styles.topIcons}>
@@ -262,7 +299,7 @@ function convertTo12Hour(time24) {
                 {/* Profile Card */}
                 <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('MemberProfile')}>
                     <View style={styles.profileRow}>
-                        <Image source={userImage ? { uri: userImage } : require('../../assets/sirImg.png')} style={styles.profileImage} />
+                        <Image source={userImage ? { uri: userImage } : require('../../assets/personPlaceholder.jpg')} style={styles.profileImage} />
                         <View style={{ flex: 1 }}>
                             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                                 <Text style={styles.name}>{userName ? userName : 'N/A'}</Text>
@@ -285,6 +322,9 @@ function convertTo12Hour(time24) {
                                 <Text style={styles.sliderLabel}>Good</Text>
                             </View>
                         </View> */}
+
+                        {
+                            attendanceData.length !==0  && (
                     <View style={styles.sliderContainer}>
                         <View style={styles.sliderTrack}>
                             <View
@@ -312,7 +352,9 @@ function convertTo12Hour(time24) {
                                         ? 'Average'
                                         : 'Good'}
                         </Text>
-                    </View>
+                    </View>     
+                            )
+                        }
 
                 </TouchableOpacity>
 
@@ -328,14 +370,14 @@ function convertTo12Hour(time24) {
                                 <MaterialIcons name="people-alt" size={24} color={commonStyles.mainColor} />
                                 <Text style={styles.card2Title}>Leads Given</Text>
                             </View>
-                            <Text style={[styles.card2Value, { marginTop: 8 }]}>15</Text>
+                            <Text style={[styles.card2Value, { marginTop: 8 }]}>{homePageCounts?.leads_given ?? 0}</Text>
                         </TouchableOpacity>
                         <TouchableOpacity style={[styles.card2, { flex: 1 }]} onPress={() => navigation.navigate('ThankYouNoteScreen')}>
                             <View style={{ flexDirection: 'row', gap: 12 }}>
                                 <FontAwesome6 name="coins" size={22} color={commonStyles.mainColor} />
                                 <Text style={styles.card2Title}>Thankyou Note</Text>
                             </View>
-                            <Text style={[styles.card2Value, { marginTop: 8 }]}>&#8377; 17,000</Text>
+                            <Text style={[styles.card2Value, { marginTop: 8 }]}>&#8377; {homePageCounts?.thankyounote_count ?? 0}</Text>
                         </TouchableOpacity>
                     </View>
                     <View style={{ flexDirection: 'row', gap: 16 }}>
@@ -344,7 +386,7 @@ function convertTo12Hour(time24) {
                                 <FontAwesome6 name="handshake-simple" size={24} color={commonStyles.mainColor} />
                                 <Text style={styles.card2Title}>1:1 Meets</Text>
                             </View>
-                            <Text style={[styles.card2Value, { marginTop: 8 }]}>6</Text>
+                            <Text style={[styles.card2Value, { marginTop: 8 }]}>{homePageCounts?.one_to_one_meeting_count ?? 0}</Text>
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.card2} onPress={() => navigation.navigate('AttendanceScreen',meetingData)}>
                             <View style={{ flexDirection: 'row', gap: 16 }}>
@@ -561,6 +603,12 @@ const styles = StyleSheet.create({
         // shadowOpacity: 0.3,
         // shadowRadius: 4,
     },
+    menuButton:{
+        position:'absolute',
+        top:responsiveHeight(40),
+        left:responsiveWidth(85),
+        right:0,
+    }
 });
 
 export default ProfileCard;

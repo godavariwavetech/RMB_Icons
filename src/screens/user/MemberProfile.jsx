@@ -1,4 +1,4 @@
-import React, { useState, useEffect} from 'react';
+import React, { useState, useEffect, useCallback} from 'react';
 import {
     View,
     Text,
@@ -13,12 +13,10 @@ import Entypo from 'react-native-vector-icons/Entypo';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import commonStyles from '../../commonstyles/CommonStyles';
-import { useNavigation, useRoute, CommonActions } from '@react-navigation/native';
+import { useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
 import Share from 'react-native-share';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import api from '../../utils/api';
-import CustomModal from '../../components/common/CustomModal';
-import { actionLogout } from '../../redux/reducers/auth';
 
 const MemberProfile = () => {
     const [selectedButton, setSelectedButton] = useState(null); // null | 'give' | 'ask'
@@ -31,22 +29,6 @@ const MemberProfile = () => {
     // const [userDob, setUserDob] = useState('');
     const [userPhone, setUserPhone] = useState('');
     const [loading,setLoading] = useState(false);
-    const [showLogoutModal, setShowLogoutModal] = useState(false);
-    const dispatch = useDispatch();
-
-    const handleLogout = () => {
-        dispatch(actionLogout());
-        setShowLogoutModal(false);
-        // navigation.navigate('LoginPage');
-        navigation.dispatch(
-            CommonActions.reset({
-              index: 0,
-              routes: [
-                {name: 'LoginPage'},
-              ],
-            }),
-          );
-    };
 
     const handleShare = async () => {
         const contactInfo = {
@@ -136,10 +118,12 @@ const MemberProfile = () => {
             Alert.alert('Error', 'Unable to open LinkedIn.')
         );
     };
-
-    useEffect(()=>{
-        FetchedData()
-    },[])
+    // useEffect(()=>{
+    //     FetchedData()
+    // },[]);
+    useFocusEffect(useCallback(() => {
+        FetchedData();
+    }, []));
 
     const FetchedData = async () => {
             try {
@@ -181,7 +165,7 @@ const MemberProfile = () => {
 
                 {/* Profile Card */}
                 <View style={styles.profileCard}>
-                    <Image source={userImage ? {uri:userImage } : require('../../assets/sirImg.png')} // replace with actual image
+                    <Image source={userImage ? {uri:userImage } : require('../../assets/personPlaceholder.jpg')} // replace with actual image
                         style={styles.profileImage}
                     />
                     <Text style={commonStyles.heading}>{userName? userName : 'N/A'}</Text>
@@ -189,19 +173,13 @@ const MemberProfile = () => {
                     <Text style={[commonStyles.text3, commonStyles.mb24]}>{userCategory ? userCategory :'N/A'}</Text>
 
                     {/* Social Icons */}
-                    <View style={styles.socialRow}>
+                    {/* <View style={styles.socialRow}>
                         <TouchableOpacity style={styles.iconWrapper} onPress={handlePhonePress}>
                             <Feather name="phone" size={22} color="#fff" />
                         </TouchableOpacity>
                         <TouchableOpacity style={[styles.iconWrapper, { backgroundColor: '#ff2147' }]} onPress={handleEmailPress}>
                             <MaterialCommunityIcons name="email-outline" size={22} color="#fff" />
                         </TouchableOpacity>
-                        {/* <TouchableOpacity style={[styles.iconWrapper, { backgroundColor: '#25B7D3' }]}>
-                            <MaterialCommunityIcons name="share-variant" size={22} color="#fff" />
-                        </TouchableOpacity> */}
-                        {/* <TouchableOpacity style={[styles.iconWrapper, { backgroundColor: '#E1306C' }]}>
-                            <FontAwesome6 name="instagram" size={20} color="#fff" />
-                        </TouchableOpacity> */}
                         <TouchableOpacity onPress={handleInstagramPress}>
                             <Image source={require('../../assets/instagramLogo.png')} style={{ width: 40, height: 40 }} />
                         </TouchableOpacity>
@@ -211,7 +189,7 @@ const MemberProfile = () => {
                         <TouchableOpacity style={[styles.iconWrapper, { backgroundColor: '#0B69C7' }]} onPress={handleLinkedInPress}>
                             <FontAwesome6 name="linkedin-in" size={20} color="#fff" />
                         </TouchableOpacity>
-                    </View>
+                    </View> */}
                 </View>
 
                 {/* Address */}
@@ -252,7 +230,7 @@ const MemberProfile = () => {
                     ))}
 
                     {/* Logout (Red colored) */}
-                    <TouchableOpacity style={[styles.menuItem, { marginTop: 12 }]} onPress={() => setShowLogoutModal(true)}>
+                    <TouchableOpacity style={[styles.menuItem, { marginTop: 12 }]} onPress={() => console.log('Logging out')}>
                         <View style={styles.menuIcon}>
                             <Feather name="power" size={20} color="red" />
                         </View>
@@ -262,15 +240,6 @@ const MemberProfile = () => {
                 </View>
                 <Text style={[{fontsize:14,fontWeight:'500',color:commonStyles.mainColor},commonStyles.mt12]}>Version 1.0.0</Text>
             </ScrollView>
-            <CustomModal
-                visible={showLogoutModal}
-                onClose={() => setShowLogoutModal(false)}
-                onConfirm={handleLogout}
-                title="Confirm Logout"
-                content="Are you sure you want to log out?"
-                confirmText="Logout"
-                cancelText="Cancel"
-            />
         </View>
     );
 };
