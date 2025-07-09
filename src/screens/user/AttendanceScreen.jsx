@@ -43,8 +43,19 @@ const AttendanceScreen = () => {
     const dispatch = useDispatch();
 
     console.log(meetingData, 'Route')
+
+    // Add these logs for debugging
+    console.log('Render: locationLoading=', locationLoading, 'userCurrentLocation=', userCurrentLocation);
+
     useEffect(() => {
-        getCurrentLocation();
+        const fetchLocationAndCheckRadius = async () => {
+            const location = await getCurrentLocation();
+            if (location) {
+                // Now that location is available, we can run checkIfWithinRadius
+                setIsInRadius(checkIfWithinRadius(100, location)); // Pass location directly
+            }
+        };
+        fetchLocationAndCheckRadius();
     }, []);
 
 
@@ -98,7 +109,10 @@ const AttendanceScreen = () => {
     // };
 
     const getCurrentLocation = async () => {
+        setLocationLoading(true); // Start loading
         try {
+            let position = null; // Initialize position to null
+
             if (Platform.OS === 'android') {
                 const granted = await PermissionsAndroid.request(
                     PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
@@ -111,89 +125,69 @@ const AttendanceScreen = () => {
                     }
                 );
                 if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-                    Geolocation.getCurrentPosition(
-                        (position) => {
-                            setUserCurrentLocation({
-                                latitude: position.coords.latitude,
-                                longitude: position.coords.longitude,
-                            });
-                        },
-                        (error) => {
-                            console.log('Initial location error:', error.message);
-                            Alert.alert('Location Error', 'Could not get your current location for initial check.');
-                        },
-                        { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
-                    );
+                    try {
+                        position = await new Promise((resolve, reject) => {
+                            Geolocation.getCurrentPosition(resolve, reject, { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 });
+                        });
+                    } catch (posError) {
+                        console.log('Geolocation.getCurrentPosition error (Android):', posError.message);
+                        Alert.alert('Location Error', 'Could not get your current location for initial check. Please ensure location services are enabled.');
+                    }
                 } else {
                     Alert.alert('Location permission denied', 'Please grant location permission to use this feature.');
                 }
             } else if (Platform.OS === 'ios') {
                 const authorizationStatus = await Geolocation.requestAuthorization('whenInUse');
                 if (authorizationStatus === 'granted') {
-                    Geolocation.getCurrentPosition(
-                        (position) => {
-                            setUserCurrentLocation({
-                                latitude: position.coords.latitude,
-                                longitude: position.coords.longitude,
-                            });
-                        },
-                        (error) => {
-                            console.log('Initial location error:', error.message);
-                            Alert.alert('Location Error', 'Could not get your current location for initial check.');
-                        },
-                        { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
-                    );
+                    try {
+                        position = await new Promise((resolve, reject) => {
+                            Geolocation.getCurrentPosition(resolve, reject, { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 });
+                        });
+                    } catch (posError) {
+                        console.log('Geolocation.getCurrentPosition error (iOS):', posError.message);
+                        Alert.alert('Location Error', 'Could not get your current location for initial check. Please ensure location services are enabled and allowed for this app.');
+                    }
                 } else {
                     Alert.alert('Location permission denied', 'Please enable location services for this app in Settings.');
                 }
             }
+
+            if (position) {
+                const { latitude, longitude } = position.coords;
+                setUserCurrentLocation({ latitude, longitude });
+                return { latitude, longitude };
+            } else {
+                // If position is null after all attempts (e.g., permission denied or location service off)
+                setUserCurrentLocation(null);
+                return null;
+            }
+
         } catch (error) {
-            console.log(error);
-            Alert.alert('Permission Error', 'An error occurred while requesting location permission.');
+            console.log('Permission/overall error:', error);
+            Alert.alert('Permission Error', 'An error occurred while requesting location or accessing services.');
+            setUserCurrentLocation(null);
+            return null;
         } finally {
-            setLocationLoading(false); // Hide loader after attempt
+            // Ensure loader is hidden regardless of outcome
+            setLocationLoading(false);
         }
     };
 
+    const checkIfWithinRadius = (radiusInMeters = 100, currentLocation) => {
+        if (!currentLocation) {
+            console.log("Cannot check radius: current location not available.");
+            return false;
+        }
 
+        const target = {
+            latitude: meetingData?.latitude || 0,
+            longitude: meetingData?.longitude || 0,
+        };
+        const distance = haversine(currentLocation, target, { unit: 'meter' });
 
+        console.log(distance, 'Distance in meters');
 
-
-    const checkIfWithinRadius = (radiusInMeters = 100) => {
-        Geolocation.getCurrentPosition(
-            (position) => {
-                const userLocation = {
-                    latitude: position.coords.latitude,
-                    longitude: position.coords.longitude,
-                };
-                console.log(userLocation, 'locatio')
-                const target = {
-                    // latitude: "17.701186286200087",
-                    // longitude: "83.29349040985109",
-                    latitude: meetingData?.latitude || 0,
-                    longitude: meetingData?.longitude || 0,
-                    // latitude:16.9979775,
-                    // longitude:81.79793
-                }
-                const distance = haversine(userLocation, target, { unit: 'meter' })
-
-                console.log(distance, 'Distance in meters');
-
-                if (distance <= radiusInMeters) {
-                    setIsInRadius(true)
-                    
-
-                } else {
-                    setIsInRadius(false)
-                    // User is outside radius
-                    setShowErrorModal(true);
-                }
-            },
-            (error) => {
-                console.log('Location error:', error.message);
-            },
-            { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
-        );
+        return distance <= radiusInMeters; // Return boolean directly
     };
 
     const openCamera = async () => {
@@ -247,6 +241,9 @@ const AttendanceScreen = () => {
     };
 
     const handleAttendanceCheck = async (selfieUri) => {
+        // Add this log for debugging
+        console.log('handleAttendanceCheck: userCurrentLocation=', userCurrentLocation);
+
         if (!userCurrentLocation) {
             Alert.alert('Location Not Available', 'Please wait while we fetch your location, or enable location services.');
             return;
@@ -346,7 +343,7 @@ const AttendanceScreen = () => {
                             <Icon name="map-pin" size={18} />
                             <Text style={styles.meetingText}>{meetingData?.meeting_venue}</Text>
                         </View>
-                        <TouchableOpacity style={styles.detailsButton} onPress={openCamera} disabled={locationLoading}>
+                        <TouchableOpacity style={styles.detailsButton} onPress={openCamera} disabled={locationLoading || !userCurrentLocation}>
                             <View style={{ flexDirection: 'row', gap: 12 }}>
                                 <Text style={styles.detailsText}>Go To Meeting</Text>
                                 <Ionicons name='arrow-forward' size={20} color="#fff" />
@@ -377,6 +374,18 @@ const AttendanceScreen = () => {
                     </View>
                 )} */}
             </ScrollView>
+
+            {/* Location Status Message (new) */}
+            {!locationLoading && !userCurrentLocation && (
+                <View style={styles.locationStatusContainer}>
+                    <Text style={styles.locationStatusText}>
+                        Unable to get your current location. Please ensure location services are enabled and permissions are granted.
+                    </Text>
+                    <TouchableOpacity onPress={getCurrentLocation} style={styles.retryButton}>
+                        <Text style={styles.retryButtonText}>Retry Location</Text>
+                    </TouchableOpacity>
+                </View>
+            )}
 
             {showSuccessModal && (
                 <View style={modalStyles.overlay}>
@@ -524,7 +533,33 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: 'rgba(255,255,255,0.7)', // Semi-transparent background
         zIndex: 1, // Ensure it's on top
-    }
+    },
+    locationStatusContainer: {
+        padding: 16,
+        backgroundColor: '#FFEBEE', // Light red background
+        borderRadius: 8,
+        margin: 16,
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: '#EF5350', // Red border
+    },
+    locationStatusText: {
+        color: '#D32F2F', // Darker red text
+        textAlign: 'center',
+        marginBottom: 8,
+        fontSize: 14,
+    },
+    retryButton: {
+        backgroundColor: commonStyles.mainColor,
+        paddingVertical: 8,
+        paddingHorizontal: 16,
+        borderRadius: 5,
+    },
+    retryButtonText: {
+        color: '#fff',
+        fontWeight: 'bold',
+        fontSize: 14,
+    },
 });
 
 const modalStyles = StyleSheet.create({
@@ -579,4 +614,5 @@ title: {
 },
 
 });
+
 
