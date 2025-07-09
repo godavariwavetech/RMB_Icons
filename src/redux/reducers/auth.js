@@ -84,6 +84,26 @@ export const requestLoginOtp = createAsyncThunk(
 
 
 
+export const addAttendence = createAsyncThunk(
+  'addAttendence',
+  async (
+    payload,
+    { rejectWithValue, fulfillWithValue},
+  ) => {
+    const response = await api.post(endpoints.ADD_ATTENDENCE,payload);
+    console.log(response,"+++++++ResponseAttendecde")
+    if (response) {
+      if (response.data) {
+        return fulfillWithValue(response.data);
+      } else {
+        return rejectWithValue('Something went wrong!');
+      }
+    }
+  },
+);
+
+
+
 
 export const AuthSlice = createSlice({
   name: 'authlice',
@@ -141,6 +161,20 @@ export const AuthSlice = createSlice({
     builder.addCase(verifyMobile.rejected, (state, action) => {
       state.loading = false;
       state.message = 'Please try again!';
+    });
+
+    builder.addCase(addAttendence.pending, (state) => {
+      state.loading = true;
+      state.message = null;
+    });
+    builder.addCase(addAttendence.fulfilled, (state, action) => {
+      state.loading = false;
+      state.message = null;
+      // You can add more specific state updates here if needed, e.g., attendance data
+    });
+    builder.addCase(addAttendence.rejected, (state, action) => {
+      state.loading = false;
+      state.message = action.payload || 'Failed to add attendance.';
     });
   },
 });

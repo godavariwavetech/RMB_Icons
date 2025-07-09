@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "524859367839",
+    "project_id": "rmb-icons",
+    "storage_bucket": "rmb-icons.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:524859367839:android:b28dc1c2fccdaf47fa5daa",
+        "android_client_info": {
+          "package_name": "com.rmbicons"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDH9pXjJO-qSupw2nl9g8FFjqt_vggNIMY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

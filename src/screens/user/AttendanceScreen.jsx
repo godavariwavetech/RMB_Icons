@@ -18,24 +18,33 @@ import commonStyles from '../../commonstyles/CommonStyles';
 import Geolocation from 'react-native-geolocation-service';
 import haversine from 'haversine';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { isCurrentTimeInWindow } from '../../utils/isCurrentTimeInWindow';
+import { useSelector, useDispatch } from 'react-redux';
+import api from '../../utils/api';
+import { addAttendence } from '../../redux/reducers/auth';
+import { unwrapResult } from '@reduxjs/toolkit';
+import Loader from '../../components/loader';
 
 const AttendanceScreen = () => {
     const [selfie, setSelfie] = useState(null);
+    const [isInRadius,setIsInRadius] = useState(false)
     const [checkInTime, setCheckInTime] = useState(null);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [showErrorModal, setShowErrorModal] = useState(false);
     const [countdown, setCountdown] = useState(10);
+    const [userCurrentLocation, setUserCurrentLocation] = useState(null); // New state to store location
+    const [locationLoading, setLocationLoading] = useState(true); // New state for location loading
+    const [apiLoading, setApiLoading] = useState(false); // New state for API loading
  
-
-
-
     const navigation = useNavigation();
     const route = useRoute();
     const meetingData = route.params;
+    const { userId } = useSelector(state => state.Auth);
+    const dispatch = useDispatch();
 
     console.log(meetingData, 'Route')
     useEffect(() => {
-        // checkIfWithinRadius();
+        getCurrentLocation();
     }, []);
 
 
@@ -90,29 +99,64 @@ const AttendanceScreen = () => {
 
     const getCurrentLocation = async () => {
         try {
-            const granted = await PermissionsAndroid.request(
-                PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-                {
-                    title: 'Location Permission',
-                    message: 'This app needs access to your location for navigation.',
-                    buttonNeutral: 'Ask Me Later',
-                    buttonNegative: 'Deny',
-                    buttonPositive: 'Allow',
+            if (Platform.OS === 'android') {
+                const granted = await PermissionsAndroid.request(
+                    PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+                    {
+                        title: 'Location Permission',
+                        message: 'This app needs access to your location for navigation.',
+                        buttonNeutral: 'Ask Me Later',
+                        buttonNegative: 'Deny',
+                        buttonPositive: 'Allow',
+                    }
+                );
+                if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+                    Geolocation.getCurrentPosition(
+                        (position) => {
+                            setUserCurrentLocation({
+                                latitude: position.coords.latitude,
+                                longitude: position.coords.longitude,
+                            });
+                        },
+                        (error) => {
+                            console.log('Initial location error:', error.message);
+                            Alert.alert('Location Error', 'Could not get your current location for initial check.');
+                        },
+                        { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+                    );
+                } else {
+                    Alert.alert('Location permission denied', 'Please grant location permission to use this feature.');
                 }
-            );
-            if (granted == PermissionsAndroid.RESULTS.GRANTED) {
-                checkIfWithinRadius()
+            } else if (Platform.OS === 'ios') {
+                const authorizationStatus = await Geolocation.requestAuthorization('whenInUse');
+                if (authorizationStatus === 'granted') {
+                    Geolocation.getCurrentPosition(
+                        (position) => {
+                            setUserCurrentLocation({
+                                latitude: position.coords.latitude,
+                                longitude: position.coords.longitude,
+                            });
+                        },
+                        (error) => {
+                            console.log('Initial location error:', error.message);
+                            Alert.alert('Location Error', 'Could not get your current location for initial check.');
+                        },
+                        { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+                    );
+                } else {
+                    Alert.alert('Location permission denied', 'Please enable location services for this app in Settings.');
+                }
             }
         } catch (error) {
-            console.log(error)
+            console.log(error);
+            Alert.alert('Permission Error', 'An error occurred while requesting location permission.');
+        } finally {
+            setLocationLoading(false); // Hide loader after attempt
         }
+    };
 
-    }
 
 
-    useEffect(() => {
-        getCurrentLocation()
-    }, [])
 
 
     const checkIfWithinRadius = (radiusInMeters = 100) => {
@@ -126,28 +170,22 @@ const AttendanceScreen = () => {
                 const target = {
                     // latitude: "17.701186286200087",
                     // longitude: "83.29349040985109",
-                    // latitude: meetingData?.latitude || 0,
-                    // longitude: meetingData?.longitude || 0,
-                    latitude:16.9979775,
-                    longitude:81.79793
+                    latitude: meetingData?.latitude || 0,
+                    longitude: meetingData?.longitude || 0,
+                    // latitude:16.9979775,
+                    // longitude:81.79793
                 }
                 const distance = haversine(userLocation, target, { unit: 'meter' })
 
                 console.log(distance, 'Distance in meters');
 
                 if (distance <= radiusInMeters) {
-                    setShowSuccessModal(true);
-                    let interval = setInterval(() => {
-                        setCountdown(prev => {
-                            if (prev === 1) {
-                                clearInterval(interval);
-                                setShowSuccessModal(false);
-                                navigation.navigate('ProfileCard');
-                            }
-                            return prev - 1;
-                        });
-                    }, 1000);
+                    setIsInRadius(true)
+                    
+
                 } else {
+                    setIsInRadius(false)
+                    // User is outside radius
                     setShowErrorModal(true);
                 }
             },
@@ -175,13 +213,19 @@ const AttendanceScreen = () => {
                     Alert.alert('Camera permission denied');
                     return;
                 }
+            } else if (Platform.OS === 'ios') {
+                // For iOS, react-native-image-picker's launchCamera usually triggers the permission prompt
+                // as long as NSCameraUsageDescription is in Info.plist. 
+                // No explicit request needed here if relying on the library's default behavior.
+                // If you need more granular control or to check status beforehand, you would use 
+                // a dedicated permissions library like react-native-permissions.
             }
 
             launchCamera(
                 {
                     mediaType: 'photo',
                     cameraType: 'front',
-                    includeBase64: false,
+                    includeBase64: true,
                     saveToPhotos: false
                 },
                 (response) => {
@@ -189,14 +233,89 @@ const AttendanceScreen = () => {
                         console.log('User cancelled camera');
                     } else if (response.errorCode) {
                         Alert.alert('Camera Error', response.errorMessage);
-                    } else {
-                        setSelfie(response.assets[0].uri);
-                        setCheckInTime(new Date().toLocaleTimeString());
+                    }
+                    else {
+                        const base64Image = `data:image/jpeg;base64,${response.assets[0].base64}`;
+                        setSelfie(base64Image);
+                        handleAttendanceCheck(base64Image);
                     }
                 }
             );
         } catch (error) {
             console.error(error);
+        }
+    };
+
+    const handleAttendanceCheck = async (selfieUri) => {
+        if (!userCurrentLocation) {
+            Alert.alert('Location Not Available', 'Please wait while we fetch your location, or enable location services.');
+            return;
+        }
+
+        const userLocation = userCurrentLocation; // Use the pre-fetched location
+
+        const isInTime = isCurrentTimeInWindow(meetingData);
+        const target = {
+            latitude: meetingData?.latitude || 0,
+            longitude: meetingData?.longitude || 0,
+        };
+        const distance = haversine(userLocation, target, { unit: 'meter' });
+        const radiusInMeters = 100; // Define your radius
+        const isInRadius = distance <= radiusInMeters;
+
+        console.log("Is in time:", isInTime);
+        console.log("Is in radius:", isInRadius);
+
+        if (isInTime && isInRadius) {
+            const currentTime = new Date().toLocaleTimeString('en-US', { hour12: false });
+            const currentDate = new Date().toISOString().slice(0, 10);
+
+            const payload = {
+                attend_time: currentTime,
+                attend_date: currentDate,
+                attend_lat: userLocation.latitude.toString(),
+                attend_lang: userLocation.longitude.toString(),
+                rmb_user_id: userId,
+                attend_meet_id: meetingData?.id,
+                selfieimage: selfieUri,
+            };
+            console.log(payload, 'API Payload');
+
+            try {
+                setApiLoading(true); // Show loader for API call
+                const resultAction = await dispatch(addAttendence(payload));
+                const originalPromiseResult = unwrapResult(resultAction);
+                console.log('Attendance API response:', originalPromiseResult);
+
+                if (originalPromiseResult.status === 200) {
+                    setShowSuccessModal(true);
+                    let interval = setInterval(() => {
+                        setCountdown(prev => {
+                            if (prev === 1) {
+                                clearInterval(interval);
+                                setShowSuccessModal(false);
+                                navigation.navigate('ProfileCard');
+                            }
+                            return prev - 1;
+                        });
+                    }, 1000);
+                } else {
+                    Alert.alert('Attendance Failed', originalPromiseResult.message || 'Something went wrong.');
+                    setShowErrorModal(true);
+                }
+            } catch (error) {
+                console.error('API Error:', error);
+                Alert.alert('API Error', error.message || 'Failed to submit attendance.');
+                setShowErrorModal(true);
+            } finally {
+                setApiLoading(false); // Hide loader after API call
+            }
+        } else if (!isInRadius) {
+            Alert.alert('Outside Location', 'You are not within the meeting radius. Please reach the venue to mark attendance.');
+            setShowErrorModal(true);
+        } else if (!isInTime) {
+            Alert.alert('Time Window Error', 'You are outside the designated time window for this meeting.');
+            setShowErrorModal(true);
         }
     };
 
@@ -212,27 +331,34 @@ const AttendanceScreen = () => {
 
             <ScrollView contentContainerStyle={styles.container}>
                 {/* First Card - Meeting Info */}
-                <View style={styles.meetingCard}>
-                    <Text style={styles.nextTitle}>Next Meeting</Text>
-                    <View style={styles.meetingRow}>
-                        <Icon name="calendar" size={18} />
-                        <Text style={styles.meetingText}>Coming Soon</Text>
-                    </View>
-                    <View style={styles.meetingRow}>
-                        <Icon name="clock" size={18} />
-                        <Text style={styles.meetingText}>7:30 AM</Text>
-                    </View>
-                    <View style={styles.meetingRow}>
-                        <Icon name="map-pin" size={18} />
-                        <Text style={styles.meetingText}>La Hospin Hotel</Text>
-                    </View>
-                    <TouchableOpacity style={styles.detailsButton} onPress={openCamera}>
-                        <View style={{ flexDirection: 'row', gap: 12 }}>
-                            <Text style={styles.detailsText}>Go To Meeting</Text>
-                            <Ionicons name='arrow-forward' size={20} color="#fff" />
+                {meetingData && Object.keys(meetingData).length > 0 ? (
+                    <View style={styles.meetingCard}>
+                        <Text style={styles.nextTitle}>Next Meeting</Text>
+                        <View style={styles.meetingRow}>
+                            <Icon name="calendar" size={18} />
+                            <Text style={styles.meetingText}>{meetingData?.meeting_date}</Text>
                         </View>
-                    </TouchableOpacity>
-                </View>
+                        <View style={styles.meetingRow}>
+                            <Icon name="clock" size={18} />
+                            <Text style={styles.meetingText}>{meetingData?.meeting_time}</Text>
+                        </View>
+                        <View style={styles.meetingRow}>
+                            <Icon name="map-pin" size={18} />
+                            <Text style={styles.meetingText}>{meetingData?.meeting_venue}</Text>
+                        </View>
+                        <TouchableOpacity style={styles.detailsButton} onPress={openCamera} disabled={locationLoading}>
+                            <View style={{ flexDirection: 'row', gap: 12 }}>
+                                <Text style={styles.detailsText}>Go To Meeting</Text>
+                                <Ionicons name='arrow-forward' size={20} color="#fff" />
+                            </View>
+                        </TouchableOpacity>
+                    </View>
+                ) : (
+                    <View style={styles.noMeetingCard}>
+                        <Text style={styles.noMeetingText}>No Meeting Data Available</Text>
+                        <Text style={styles.noMeetingSubText}>Please check back later or contact support.</Text>
+                    </View>
+                )}
 
                 {/* Second Card - After Selfie */}
                 {/* {selfie && (
@@ -295,6 +421,11 @@ const AttendanceScreen = () => {
                     </View>
                 )
             }
+            {apiLoading || locationLoading ? (
+                <View style={[StyleSheet.absoluteFillObject, styles.loaderContainer]}>
+                    <Loader />
+                </View>
+            ) : null} 
         </View>
     );
 };
@@ -366,6 +497,34 @@ const styles = StyleSheet.create({
         // marginBottom: 6,
         fontWeight: '500'
     },
+    noMeetingCard: {
+        backgroundColor: '#fff',
+        padding: 16,
+        borderRadius: 10,
+        borderWidth: 0.5,
+        borderColor: '#ccc',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: 150,
+        marginTop: 20,
+    },
+    noMeetingText: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#888',
+        marginBottom: 8,
+    },
+    noMeetingSubText: {
+        fontSize: 14,
+        color: '#888',
+        textAlign: 'center',
+    },
+    loaderContainer: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(255,255,255,0.7)', // Semi-transparent background
+        zIndex: 1, // Ensure it's on top
+    }
 });
 
 const modalStyles = StyleSheet.create({

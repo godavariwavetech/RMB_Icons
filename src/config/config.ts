@@ -6,5 +6,6 @@ export const endpoints = {
   SIGNUP: 'customers/v1/loginCheck',
   TOUR_PACKAGES:'packages/v1/getAll',
   GET_RENTAL_ITEMS:"rentalItems/v1/getAll",
-  GET_ALL_ORDERS:'categories/v1/getAll'
+  GET_ALL_ORDERS:'categories/v1/getAll',
+  ADD_ATTENDENCE:"addattendenance"
 };
