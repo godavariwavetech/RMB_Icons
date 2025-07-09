@@ -59,12 +59,39 @@ export const loginAction = createAsyncThunk(
   },
 );
 
+
+
+export const requestLoginOtp = createAsyncThunk(
+  'requestLoginOtp',
+  async (
+    phone,
+    { rejectWithValue, fulfillWithValue},
+  ) => {
+    const data = {
+      number: phone,
+    };
+    const response = await api.post(endpoints.LOGIN, data);
+    console.log(response,"+++++++++++RESPONSNSNSN")
+    if (response) {
+      if (response.data) {
+        return fulfillWithValue(response.data);
+      } else {
+        return rejectWithValue('Something went wrong!');
+      }
+    }
+  },
+);
+
+
+
+
 export const AuthSlice = createSlice({
   name: 'authlice',
   initialState,
   reducers: {
     actionLogout: state => {
       state.token = null;
+      state.userId=null
     },
     actionLogin: state => {
       state.token = 'sample token';

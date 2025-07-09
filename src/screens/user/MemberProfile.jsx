@@ -13,10 +13,12 @@ import Entypo from 'react-native-vector-icons/Entypo';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import commonStyles from '../../commonstyles/CommonStyles';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { useNavigation, useRoute, CommonActions } from '@react-navigation/native';
 import Share from 'react-native-share';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import api from '../../utils/api';
+import CustomModal from '../../components/common/CustomModal';
+import { actionLogout } from '../../redux/reducers/auth';
 
 const MemberProfile = () => {
     const [selectedButton, setSelectedButton] = useState(null); // null | 'give' | 'ask'
@@ -29,6 +31,22 @@ const MemberProfile = () => {
     // const [userDob, setUserDob] = useState('');
     const [userPhone, setUserPhone] = useState('');
     const [loading,setLoading] = useState(false);
+    const [showLogoutModal, setShowLogoutModal] = useState(false);
+    const dispatch = useDispatch();
+
+    const handleLogout = () => {
+        dispatch(actionLogout());
+        setShowLogoutModal(false);
+        // navigation.navigate('LoginPage');
+        navigation.dispatch(
+            CommonActions.reset({
+              index: 0,
+              routes: [
+                {name: 'LoginPage'},
+              ],
+            }),
+          );
+    };
 
     const handleShare = async () => {
         const contactInfo = {
@@ -234,7 +252,7 @@ const MemberProfile = () => {
                     ))}
 
                     {/* Logout (Red colored) */}
-                    <TouchableOpacity style={[styles.menuItem, { marginTop: 12 }]} onPress={() => console.log('Logging out')}>
+                    <TouchableOpacity style={[styles.menuItem, { marginTop: 12 }]} onPress={() => setShowLogoutModal(true)}>
                         <View style={styles.menuIcon}>
                             <Feather name="power" size={20} color="red" />
                         </View>
@@ -244,6 +262,15 @@ const MemberProfile = () => {
                 </View>
                 <Text style={[{fontsize:14,fontWeight:'500',color:commonStyles.mainColor},commonStyles.mt12]}>Version 1.0.0</Text>
             </ScrollView>
+            <CustomModal
+                visible={showLogoutModal}
+                onClose={() => setShowLogoutModal(false)}
+                onConfirm={handleLogout}
+                title="Confirm Logout"
+                content="Are you sure you want to log out?"
+                confirmText="Logout"
+                cancelText="Cancel"
+            />
         </View>
     );
 };

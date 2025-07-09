@@ -17,8 +17,11 @@ import { useNavigation } from '@react-navigation/native';
 import api from '../../utils/api';
 import Loader from '../../components/loader';
 import axios from 'axios';
+import { useDispatch } from 'react-redux';
+import { requestLoginOtp } from '../../redux/reducers/auth';
 
 const LoginScreen = () => {
+  const dispatch = useDispatch()
   const [phone, setPhone] = useState('');
   const [error, setError] = useState('');
   const navigation = useNavigation();
@@ -32,11 +35,19 @@ const LoginScreen = () => {
       setError('');
       try {
         setLoading(true)
-        const resp = await api.post('getappotp',{number:phone});
-        console.log(resp.data,'RES>>>>');
-        if(resp.data.status==200){
+        const resp = await dispatch(requestLoginOtp(phone))
+
+        // console.log(resp,'>>>>>>>>>>>>>>>>>>>>>>>Response')
+        // return
+        // const resp = await api.post('getappotp',{number:phone});
+        console.log(resp,'RES>>>>');
+        // return
+        if(resp.payload.status==200){
           navigation.navigate('OTPVerificationScreen',phone);
-        } else if (resp.data.status==202){
+        } else if (resp.payload.status==201){
+          navigation.navigate('RegistrationSubmittedScreen',phone);
+        }
+        else if(resp.payload.status==202){
           navigation.navigate('RegistrationForm',{afterLogin:true,mobileNUmber:phone});
         }
       } catch (error) {
@@ -119,8 +130,8 @@ const LoginScreen = () => {
               // onChangeText={text => setPhone(text)}
               onChangeText={(text) => {
                 const numericText = text.replace(/[^0-9]/g, '')
-                setPhone(numericText),
-                  setError('')
+                setPhone(numericText)
+                setError('')
               }}
               value={phone}
               placeholderTextColor={commonStyles.lightColor}

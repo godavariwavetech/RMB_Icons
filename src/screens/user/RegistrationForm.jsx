@@ -339,8 +339,9 @@ if (!designation.trim()) newErrors.designation = 'Designation is required';
 
 
   useEffect(()=>{
-    route.params.mobileNUmber&& setPhone(route.params.mobileNUmber)
-  },[route.params.afterLogin])
+    route.params?.mobileNUmber&& setPhone(route.params?.mobileNUmber)
+    setSelectedDate(maxDate); // Initialize selectedDate to maxDate
+  },[route.params?.afterLogin])
 
   return (
     <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
@@ -365,7 +366,6 @@ if (!designation.trim()) newErrors.designation = 'Designation is required';
         onChangeText={setPhone}
         keyboardType="numeric"
         error={errors.phone}
-        editable={route.params.afterLogin? false :true}
         maxLength={10} // Limit to 10 digits
       />
       <CustomInput
