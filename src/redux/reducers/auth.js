@@ -113,6 +113,7 @@ export const pushFcmToken = createAsyncThunk(
   ) => {
     const {userId} = getState().Auth;
     const token = await getFCMToken();
+    console.log(userId,"+++++++++++++AUTH USER")
     const payload={
         "rmb_user_id": userId,
         "player_id": token,
