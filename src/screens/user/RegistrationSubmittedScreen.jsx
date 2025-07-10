@@ -2,6 +2,7 @@ import React ,{useState} from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, StatusBar, Alert,Modal } from 'react-native';
 import { responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions';
 import commonStyles from '../../commonstyles/CommonStyles';
+import { CommonActions } from '@react-navigation/native';
 
 const RegistrationSubmittedScreen = ({ navigation, route }) => {
   const name = route?.params; // Default fallback
@@ -22,7 +23,14 @@ const RegistrationSubmittedScreen = ({ navigation, route }) => {
     setModalVisible(true);
   };
   const handleNavigation=()=>{
-                navigation.replace('ProfileCard');
+    navigation.dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [
+          {name: 'LoginPage'},
+        ],
+      }),
+    );
   }
 
   return (

@@ -403,7 +403,7 @@ function convertTo12Hour(time24) {
 
                 {/* Next Meeting */}
                 {
-                    meetingLength !==0 ? (
+                    meetingLength?.data?.length !==0 ? (
                 <View style={styles.meetingCard}>
                     <Text style={styles.nextTitle}>Next Meeting</Text>
                     <View style={styles.meetingRow}>
@@ -425,7 +425,9 @@ function convertTo12Hour(time24) {
                     </TouchableOpacity>
                 </View>
                     ) : (
+                        <View style={{alignItems:"center",justifyContent:"center",marginTop:20}}>
                         <Text>Not yet Meeting Scheduled</Text>
+                        </View>
                     )
                 }
                 {/* <Ionicons name='arrow-forward' size={20} color="#fff" /> */}
