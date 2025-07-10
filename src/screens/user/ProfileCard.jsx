@@ -270,6 +270,8 @@ function convertTo12Hour(time24) {
   return `${hour}:${minute} ${ampm}`;
 }
 
+console.log(meetingLength.data && meetingLength?.data[0],"++++++++++++++++++++>>>>>>>>>>>>meetingLength?.data[0]")
+
 
     return (
         <View style={styles.container}>
@@ -388,7 +390,7 @@ function convertTo12Hour(time24) {
                             </View>
                             <Text style={[styles.card2Value, { marginTop: 8 }]}>{homePageCounts?.one_to_one_meeting_count ?? 0}</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={styles.card2} onPress={() => navigation.navigate('AttendanceScreen',meetingData)}>
+                        <TouchableOpacity style={styles.card2} onPress={() => navigation.navigate('AttendanceScreen',meetingLength.data[0])}>
                             <View style={{ flexDirection: 'row', gap: 16 }}>
                                 <FontAwesome6 name="calendar-check" size={22} color={commonStyles.mainColor} />
                                 {/* <Text style={styles.card2Title}>Attendance</Text> */}
@@ -408,17 +410,17 @@ function convertTo12Hour(time24) {
                     <Text style={styles.nextTitle}>Next Meeting</Text>
                     <View style={styles.meetingRow}>
                         <Icon name="calendar" size={18} />
-                        <Text style={styles.meetingText}>{formatDate(meetingData?.meeting_date)}</Text>
+                        <Text style={styles.meetingText}>{formatDate( meetingLength?.data&&meetingLength?.data[0]?.meeting_date)}</Text>
                     </View>
                     <View style={styles.meetingRow}>
                         <Icon name="clock" size={18} />
-                        <Text style={styles.meetingText}>{ meetingData?.meeting_time ? convertTo12Hour(meetingData?.meeting_time) : 'N/A'}</Text>
+                        <Text style={styles.meetingText}>{meetingLength?.data&& meetingLength?.data[0]?.meeting_time ? convertTo12Hour(meetingLength?.data && meetingLength?.data[0]?.meeting_time) : 'N/A'}</Text>
                     </View>
                     <View style={styles.meetingRow}>
                         <Icon name="map-pin" size={18} />
-                        <Text style={styles.meetingText}>{meetingData?.meeting_venue ?? 'N/A'}</Text>
+                        <Text style={styles.meetingText}>{meetingLength?.data ? meetingLength?.data[0]?.meeting_venue : 'N/A'}</Text>
                     </View>
-                    <TouchableOpacity style={styles.detailsButton}>
+                    <TouchableOpacity onPress={() => navigation.navigate('AttendanceScreen',meetingLength.data[0])} style={styles.detailsButton}>
                         <View style={{ flexDirection: 'row', gap: 12 }}>
                             <Text style={styles.detailsText}>Meeting</Text>
                         </View>
