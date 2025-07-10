@@ -421,7 +421,7 @@ const AttendanceScreen = () => {
                 </View>
             )}
 
-            {
+            {/* {
                 selfie && (
                     <View style={{ margin: 16 }}>
                         <TouchableOpacity style={commonStyles.blueButton} onPress={() => navigation.goBack()}>
@@ -429,7 +429,7 @@ const AttendanceScreen = () => {
                         </TouchableOpacity>
                     </View>
                 )
-            }
+            } */}
             {apiLoading || locationLoading ? (
                 <View style={[StyleSheet.absoluteFillObject, styles.loaderContainer]}>
                     <Loader />

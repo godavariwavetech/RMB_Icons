@@ -264,6 +264,7 @@ const [designation, setDesignation] = useState('');
     eighteenYearsAgo.setFullYear(today.getFullYear() - 18);
     if (!name.trim()) newErrors.name = 'Name is required';
     if (!phone.trim()) newErrors.phone = 'Phone number is required';
+    if (phone.trim().length < 10) newErrors.phone = 'Phone number must be at least 10 digits';
     if (!business.trim()) newErrors.business = 'Business category is required';
     if (!area.trim()) newErrors.area = 'Area is required';
     if (!company.trim()) newErrors.company = 'Company name is required';

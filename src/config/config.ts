@@ -7,5 +7,6 @@ export const endpoints = {
   TOUR_PACKAGES:'packages/v1/getAll',
   GET_RENTAL_ITEMS:"rentalItems/v1/getAll",
   GET_ALL_ORDERS:'categories/v1/getAll',
-  ADD_ATTENDENCE:"addattendenance"
+  ADD_ATTENDENCE:"addattendenance",
+  POST_TOKEN:'postplayer_id'
 };

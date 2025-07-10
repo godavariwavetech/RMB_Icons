@@ -1067,7 +1067,7 @@ const AccountSettings = () => {
                 location_name: form.city,
                 state_name: form.state,
                 pin_code: form.pincode,
-               // rnb_customer_photo: imageBase64 ? `data:image/jpeg;base64,${imageBase64}` : imageUrl || '',
+               rnb_customer_photo: imageBase64 ? `data:image/jpeg;base64,${imageBase64}` : imageUrl || '',
                 designation: form.designation,
                 company_name: form.company,
                 rmb_user_id: userId,

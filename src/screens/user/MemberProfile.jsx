@@ -18,11 +18,12 @@ import Share from 'react-native-share';
 import { useDispatch, useSelector } from 'react-redux';
 import api from '../../utils/api';
 import CustomModal from '../../components/common/CustomModal';
-import { actionLogout } from '../../redux/reducers/auth';
+import { actionLogout, pushFcmToken } from '../../redux/reducers/auth';
 
 const MemberProfile = () => {
     const [selectedButton, setSelectedButton] = useState(null); // null | 'give' | 'ask'
     const navigation = useNavigation();
+
        const { userId } = useSelector(state => state.Auth);
     const [userName, setUserName] = useState('');
     const [userImage, setUserImage] = useState('');
@@ -32,6 +33,7 @@ const MemberProfile = () => {
     const [userPhone, setUserPhone] = useState('');
     const [loading,setLoading] = useState(false);
     const [showLogoutModal, setShowLogoutModal] = useState(false);
+    const [address,setAddress] = useState("")
     const dispatch = useDispatch();
 
     const handleLogout = () => {
@@ -76,11 +78,11 @@ const MemberProfile = () => {
             icon: <Feather name="user" size={20} color={commonStyles.mainColor} />,
             onPress: () => navigation.navigate('AccountSettingsScreen'),
         },
-        {
-            label: 'Share Contact',
-            icon: <Feather name="share-2" size={20} color={commonStyles.mainColor} />,
-            onPress: () => handleShare(),
-        },
+        // {
+        //     label: 'Share Contact',
+        //     icon: <Feather name="share-2" size={20} color={commonStyles.mainColor} />,
+        //     onPress: () => handleShare(),
+        // },
         {
             label: 'My Meetings',
             icon: <MaterialCommunityIcons name="account-group-outline" size={20} color={commonStyles.mainColor} />,
@@ -136,9 +138,7 @@ const MemberProfile = () => {
             Alert.alert('Error', 'Unable to open LinkedIn.')
         );
     };
-    // useEffect(()=>{
-    //     FetchedData()
-    // },[]);
+
     useFocusEffect(useCallback(() => {
         FetchedData();
     }, []));
@@ -157,6 +157,7 @@ const MemberProfile = () => {
                     // setUserDob(data?.rnb_customer_dob)
                     setUserPhone(data?.rnb_customer_phone_number);
                     setDesignation(data?.designation);
+                    setAddress(data?.address_area)
                     // setCompanyName(data?.company_name)
                 }
     
@@ -213,8 +214,7 @@ const MemberProfile = () => {
                 {/* Address */}
                 <View style={styles.addressWrapper}>
                     <Text style={[commonStyles.text3, { textAlign: 'center' }]}>
-                        3rd Floor, BVR Enclave, Morampudi Rd, VL Puram, Rehmath Nagar Colony,{"\n"}
-                        Rajamahendravaram, Andhra Pradesh 533103
+                       {address}
                     </Text>
                 </View>
 
@@ -257,7 +257,7 @@ const MemberProfile = () => {
                         <Entypo name="chevron-thin-right" size={22} color={'red'} />
                     </TouchableOpacity>
                 </View>
-                <Text style={[{fontsize:14,fontWeight:'500',color:commonStyles.mainColor},commonStyles.mt12]}>Version 1.0.0</Text>
+                <Text style={[{fontsize:14,fontWeight:'500',color:commonStyles.mainColor},commonStyles.mt12]}>Version 1.0.2</Text>
 
                 <CustomModal
                 visible={showLogoutModal}

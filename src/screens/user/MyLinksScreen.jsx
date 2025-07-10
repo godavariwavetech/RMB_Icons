@@ -9,6 +9,7 @@ import {
   StyleSheet,
   Alert,
   Modal,
+  Linking,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import { useSelector } from 'react-redux';
@@ -17,6 +18,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
 import Loader from '../../components/loader';
 import commonStyles from '../../commonstyles/CommonStyles';
+import { responsiveHeight } from 'react-native-responsive-dimensions';
 
 // Extract domain name from URL as fallback label
 const getLabelFromUrl = (url) => {
@@ -40,7 +42,12 @@ const MyLinksScreen = ({ navigation }) => {
 
   useFocusEffect(
     useCallback(() => {
-      const getALLLinks = async () => {
+
+      getALLLinks();
+    }, [userId])
+  );
+
+        const getALLLinks = async () => {
         try {
           setLoading(true);
           const resp = await api.post('getsocialmedialinks', { user_id: userId });
@@ -61,9 +68,6 @@ const MyLinksScreen = ({ navigation }) => {
           setLoading(false);
         }
       };
-      getALLLinks();
-    }, [userId])
-  );
 
   const handleAddCustomLink = () => {
     setModalLink({ label: '', url: '', platform_id: null, index: null });
@@ -72,9 +76,9 @@ const MyLinksScreen = ({ navigation }) => {
     setModalVisible(true);
   };
 
-  const handleEditLink = (index) => {
+  const handleEditLink = (index,item) => {
     const link = links[index];
-    setModalLink({ ...link, index });
+    setModalLink(item);
     setModalMode('edit');
     setModalErrors({});
     setModalVisible(true);
@@ -112,64 +116,120 @@ const MyLinksScreen = ({ navigation }) => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleModalSubmit = async () => {
-    if (modalMode === 'delete') return;
-    if (!validateModal()) return;
+//   const handleModalSubmit = async () => {
+//     if (modalMode === 'delete') return;
+//     if (!validateModal()) return;
 
-    try {
-      const submissionData = {
-        platform_name: modalLink.label || getLabelFromUrl(modalLink.url) || 'Custom Link',
-        platform_url: modalLink.url,
-        rmb_user_id: userId,
-        ...(modalMode === 'edit' && modalLink.platform_id ? { platform_id: modalLink.platform_id } : {}),
-      };
+//     try {
+//       const submissionData = {
+//         platform_name: modalLink.label || getLabelFromUrl(modalLink.url) || 'Custom Link',
+//         platform_url: modalLink.url,
+//         rmb_user_id: userId,
+//         ...(modalMode === 'edit' && modalLink.platform_id ? { platform_id: modalLink.platform_id } : {}),
+//       };
 
-      const apiEndpoint = modalMode === 'edit' ? 'update_rmb_customer_social_media' : 'post_rmb_customer_social_media';
-      const resp = await api.post(apiEndpoint, submissionData);
-      console.log(submissionData, 'Link submission data');
+//       const apiEndpoint = modalMode === 'edit' ? 'update_rmb_customer_social_media' : 'post_rmb_customer_social_media';
+//       const resp = await api.post(apiEndpoint, submissionData);
+//       console.log(submissionData, 'Link submission data');
+// console.log(resp.data,'Response from API');
+//       const { index } = modalLink;
+//       const newLink = {
+//         id: resp.data.id || Date.now(),
+//         platform_id: resp.data.platform_id || modalLink.platform_id || Date.now(),
+//         label: modalLink.label || getLabelFromUrl(modalLink.url) || 'Custom Link',
+//         url: modalLink.url,
+//         type: 'custom',
+//       };
 
-      const { index } = modalLink;
-      const newLink = {
-        id: resp.data.id || Date.now(),
-        platform_id: resp.data.platform_id || modalLink.platform_id || Date.now(),
-        label: modalLink.label || getLabelFromUrl(modalLink.url) || 'Custom Link',
-        url: modalLink.url,
-        type: 'custom',
-      };
+//       if (index !== null) {
+//         const updatedLinks = [...links];
+//         updatedLinks[index] = newLink;
+//         setLinks(updatedLinks);
+//       } else {
+//         setLinks([...links, newLink]);
+//       }
 
-      if (index !== null) {
-        const updatedLinks = [...links];
-        updatedLinks[index] = newLink;
-        setLinks(updatedLinks);
-      } else {
-        setLinks([...links, newLink]);
-      }
+//       setModalVisible(false);
+//       Toast.show({
+//         type: 'success',
+//         text1: 'Success',
+//         text2: modalMode === 'edit' ? 'Link updated successfully' : 'Link added successfully',
+//         position: 'top',
+//         visibilityTime: 3000,
+//       });
+//       //Alert.alert('Success', modalMode === 'edit' ? 'Link updated successfully' : 'Link added successfully');
+//     } catch (error) {
+//       console.log(`Error ${modalMode === 'edit' ? 'updating' : 'adding'} link:`, error);
+//       Alert.alert('Error', `Failed to ${modalMode === 'edit' ? 'update' : 'add'} link`);
+//     }
+//   };
 
-      setModalVisible(false);
-      Toast.show({
-        type: 'success',
-        text1: 'Success',
-        text2: modalMode === 'edit' ? 'Link updated successfully' : 'Link added successfully',
-        position: 'top',
-        visibilityTime: 3000,
-      });
-      //Alert.alert('Success', modalMode === 'edit' ? 'Link updated successfully' : 'Link added successfully');
-    } catch (error) {
-      console.log(`Error ${modalMode === 'edit' ? 'updating' : 'adding'} link:`, error);
-      Alert.alert('Error', `Failed to ${modalMode === 'edit' ? 'update' : 'add'} link`);
-    }
-  };
 
+const handleModalSubmit = async () => {
+  if (modalMode === 'delete') return;
+  if (!validateModal()) return;
+
+  try {
+    const newData = {
+      platform_name: modalLink.label || getLabelFromUrl(modalLink.url) || 'Custom Link',
+      platform_url: modalLink.url,
+      rmb_user_id: userId,
+      ...(modalMode === 'edit' && modalLink.platform_id ? { platform_id: modalLink.platform_id } : {}),
+    };
+  
+    console.log(modalLink, 'Modal link data');
+        const { index } = modalLink;
+    const newLink = {
+      rmb_user_id:userId , // Use API-provided id if available
+      platform_id: modalLink.platform_id , // Use API-provided platform_id
+      platform_name: modalLink.label,
+      platform_url: modalLink.url,
+    };
+
+    
+    
+    const submissionData =  modalMode === 'edit' ? newLink:newData
+    console.log(submissionData," New link data");
+
+    const apiEndpoint = modalMode === 'edit' ? 'update_rmb_customer_social_media' : 'post_rmb_customer_social_media';
+    const resp = await api.post(apiEndpoint, submissionData);
+    console.log(submissionData, 'Link submission data');
+    console.log(resp.data, 'Response from API');
+
+
+
+    // if (index !== null) {
+    //   const updatedLinks = [...links];
+    //   updatedLinks[index] = newLink;
+    //   setLinks(updatedLinks);
+    // } else {
+    //   setLinks([...links, newLink]);
+    // }
+
+    setModalVisible(false);
+    getALLLinks()
+    Toast.show({
+      type: 'success',
+      text1: 'Success',
+      text2: modalMode === 'edit' ? 'Link updated successfully' : 'Link added successfully',
+      position: 'top',
+      visibilityTime: 3000,
+    });
+  } catch (error) {
+    console.log(`Error ${modalMode === 'edit' ? 'updating' : 'adding'} link:`, error);
+    Alert.alert('Error', `Failed to ${modalMode === 'edit' ? 'update' : 'add'} link`);
+  }
+};
   const handleModalDelete = async () => {
     if (modalMode !== 'delete') return;
 
     try {
       if (modalLink.platform_id) {
-        // const data={
-        //    platform_id: modalLink.platform_id,
-        //   rmb_user_id: userId,
-        // }
-        // console.log(data, 'Delete link data');
+        const data={
+           platform_id: modalLink.platform_id,
+          rmb_user_id: userId,
+        }
+        console.log(data, 'Delete link data');
         // return
         await api.post('delete_rmb_customer_social_media', {
           platform_id: modalLink.platform_id,
@@ -179,7 +239,10 @@ const MyLinksScreen = ({ navigation }) => {
 
       const updatedLinks = [...links];
       updatedLinks.splice(modalLink.index, 1);
-      setLinks(updatedLinks);
+
+      getALLLinks()
+
+      // setLinks(updatedLinks);
 
       setModalVisible(false);
       // Alert.alert('Success', 'Link deleted successfully');
@@ -221,6 +284,16 @@ const MyLinksScreen = ({ navigation }) => {
     )
   }
 
+  const handleLinkNavigation = (itemUrl) => {
+    const url = itemUrl?.toString();
+    console.log(url, 'Link URL',typeof(url));
+    // return
+          // const url = 'https://www.linkedin.com/in/rajivnani/'; // replace with actual
+          Linking.openURL(url).catch(() =>
+              Alert.alert('Error', 'Unable to open this Link.')
+          );
+      };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -231,6 +304,13 @@ const MyLinksScreen = ({ navigation }) => {
       </View>
       <View style={styles.hr} />
 
+      <View style={{flex:1,paddingHorizontal:16}}>
+
+        { links.length === 0 && (
+          <View style={{flex:1,justifyContent:'center',alignItems:'center',marginTop:responsiveHeight(20)}}>
+            <Text style={{fontSize:16,color:'#555'}}>No links added yet.</Text>
+          </View>
+        )}
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         {links.map((item, index) => (
           <View key={item.id} style={styles.card}>
@@ -238,7 +318,7 @@ const MyLinksScreen = ({ navigation }) => {
               <Icon name="link" size={20} color="#555" style={{ marginRight: 8 }} />
               <Text style={styles.labelText}>{item.label || getLabelFromUrl(item.url) || 'Custom Link'}</Text>
               <View style={styles.iconRow}>
-                <TouchableOpacity style={styles.editButton} onPress={() => handleEditLink(index)}>
+                <TouchableOpacity style={styles.editButton} onPress={() => handleEditLink(index,item)}>
                   <Icon name="edit" size={18} color="#007AFF" />
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.deleteButton} onPress={() => handleDeleteLink(index)}>
@@ -246,19 +326,23 @@ const MyLinksScreen = ({ navigation }) => {
                 </TouchableOpacity>
               </View>
             </View>
-            <Text style={styles.urlText}>{item.url}</Text>
+            <TouchableOpacity  onPress={()=>handleLinkNavigation(item.url)}>
+              <Text style={styles.urlText}>{item.url}</Text>
+            </TouchableOpacity>
           </View>
         ))}
 
-        <TouchableOpacity style={styles.addButton} onPress={handleAddCustomLink}>
+        {/* <TouchableOpacity style={styles.addButton} onPress={handleAddCustomLink}>
           <Icon name="plus-circle" size={18} color="#007AFF" />
           <Text style={styles.addText}> Add New</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
-        <TouchableOpacity style={styles.updateButton} onPress={handleSubmit}>
-          <Text style={styles.updateText}>Update</Text>
-        </TouchableOpacity>
       </ScrollView>
+          <TouchableOpacity style={[commonStyles.blueButton,{flexDirection:'row',alignItems:'center',gap:10,marginBottom:16}]} onPress={handleAddCustomLink}>
+            <Icon name="plus-circle" size={18} color="#FFF" />
+            <Text style={commonStyles.blueButtonText}> Add New</Text>
+          </TouchableOpacity>
+      </View>
 
       <Modal
         animationType="slide"
@@ -296,6 +380,7 @@ const MyLinksScreen = ({ navigation }) => {
                     placeholder="Enter platform name"
                     value={modalLink.label}
                     onChangeText={(text) => handleModalChange('label', text)}
+                    placeholderTextColor='#999'
                   />
                   {modalErrors.label && <Text style={styles.errorText}>{modalErrors.label}</Text>}
                 </View>
@@ -306,6 +391,7 @@ const MyLinksScreen = ({ navigation }) => {
                     placeholder="Enter URL"
                     value={modalLink.url}
                     onChangeText={(text) => handleModalChange('url', text)}
+                    placeholderTextColor='#999'
                   />
                   {modalErrors.url && <Text style={styles.errorText}>{modalErrors.url}</Text>}
                 </View>
@@ -337,8 +423,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#F6F8FA',
   },
   scroll: {
-    padding: 16,
-    paddingBottom: 30,
+    // padding: 16,
+    paddingBottom: 10,
+    paddingTop:12
   },
   card: {
     backgroundColor: '#fff',

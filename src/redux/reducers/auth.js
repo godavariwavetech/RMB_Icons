@@ -1,6 +1,8 @@
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
 import api from '../../utils/api';
 import {endpoints} from '../../config/config';
+import { getToken } from '@react-native-firebase/messaging';
+import { getFCMToken } from '../../services/NotificationsService';
 
 const initialState = {
   message: null,
@@ -103,6 +105,29 @@ export const addAttendence = createAsyncThunk(
 );
 
 
+export const pushFcmToken = createAsyncThunk(
+  'pushFcmToken',
+  async (
+    _,
+    {getState, rejectWithValue, fulfillWithValue},
+  ) => {
+    const {userId} = getState().Auth;
+    const token = await getFCMToken();
+    const payload={
+        "rmb_user_id": userId,
+        "player_id": token,
+        "user_type": "0"
+    }
+    const response = await api.post(endpoints.POST_TOKEN,payload);
+    if (response) {
+      if (response.data) {
+        return fulfillWithValue(response.data);
+      } else {
+        return rejectWithValue('Something went wrong!');
+      }
+    }
+  },
+);
 
 
 export const AuthSlice = createSlice({
