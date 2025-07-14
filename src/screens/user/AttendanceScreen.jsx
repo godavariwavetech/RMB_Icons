@@ -173,7 +173,7 @@ const AttendanceScreen = () => {
         }
     };
 
-    const checkIfWithinRadius = (radiusInMeters = 100, currentLocation) => {
+    const checkIfWithinRadius = (radiusInMeters = 500, currentLocation) => {
         if (!currentLocation) {
             console.log("Cannot check radius: current location not available.");
             return false;
@@ -316,6 +316,8 @@ const AttendanceScreen = () => {
         }
     };
 
+    const alreadyAttended = meetingData?.meeting_attend_status === 0;
+
     return (
         <View style={{ flex: 1, backgroundColor: "#fff" }}>
             <View style={styles.header}>
@@ -343,12 +345,18 @@ const AttendanceScreen = () => {
                             <Icon name="map-pin" size={18} />
                             <Text style={styles.meetingText}>{meetingData?.meeting_venue}</Text>
                         </View>
-                        <TouchableOpacity style={styles.detailsButton} onPress={openCamera} disabled={locationLoading || !userCurrentLocation}>
-                            <View style={{ flexDirection: 'row', gap: 12 }}>
-                                <Text style={styles.detailsText}>Go To Meeting</Text>
-                                <Ionicons name='arrow-forward' size={20} color="#fff" />
+                        {alreadyAttended ? (
+                            <View style={[styles.detailsButton, { backgroundColor: '#ccc' }]}> 
+                                <Text style={[styles.detailsText, { color: '#888' }]}>Already attended</Text>
                             </View>
-                        </TouchableOpacity>
+                        ) : (
+                            <TouchableOpacity style={styles.detailsButton} onPress={openCamera} disabled={locationLoading || !userCurrentLocation}>
+                                <View style={{ flexDirection: 'row', gap: 12 }}>
+                                    <Text style={styles.detailsText}>Go To Meeting</Text>
+                                    <Ionicons name='arrow-forward' size={20} color="#fff" />
+                                </View>
+                            </TouchableOpacity>
+                        )}
                     </View>
                 ) : (
                     <View style={styles.noMeetingCard}>

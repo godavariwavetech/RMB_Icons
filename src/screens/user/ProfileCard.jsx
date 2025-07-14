@@ -222,7 +222,9 @@ const ProfileCard = () => {
     const getMeetings = async () => {
         try {
             setLoading(true);
-            const resp = await api.get('getnewmeetings');
+            const resp = await api.post('getnewmeetings',{
+                "rmb_user_id": userId
+            });
             console.log(resp.data,'meet')
             setMeetinglength(resp.data)
             const data = await resp.data.data[0];
