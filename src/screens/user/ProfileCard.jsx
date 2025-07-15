@@ -32,18 +32,18 @@ const ProfileCard = () => {
 
     const navigation = useNavigation();
     const [meetingData, setMeetingData] = useState({});
-    const [meetingLength,setMeetinglength] = useState([]);
+    const [meetingLength, setMeetinglength] = useState([]);
     const [draggableMenuVisible, setDraggableMenuVisible] = useState(false);
-    const [homePageCounts,setHomePageCounts] = useState({});
+    const [homePageCounts, setHomePageCounts] = useState({});
     const [attendanceData, setAttendanceData] = useState({});
     // const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
     // const ICON_SIZE = 56; // Total icon size with padding
     //     const pan = useRef(new Animated.ValueXY({ x: 300, y: 100 })).current; // default position
 
-     const onRefresh = useCallback(() => {
+    const onRefresh = useCallback(() => {
         setRefreshing(true);
         FetchedData();
-         getMeetings();
+        getMeetings();
         getHomePageCounts();
         getAttendancePercentage()
         setRefreshing(false);
@@ -152,9 +152,9 @@ const ProfileCard = () => {
     ).current;
 
     console.log(userId, '>>>>>>>>>>>>>>>>>')
-    useEffect(()=>{
+    useEffect(() => {
         dispatch(pushFcmToken())
-    },[]);
+    }, []);
     useFocusEffect(useCallback(() => {
         FetchedData();
         getMeetings();
@@ -163,9 +163,9 @@ const ProfileCard = () => {
     }, []));
 
 
-    const getAttendancePercentage = async()=>{
+    const getAttendancePercentage = async () => {
         try {
-            const resp = await api.post('attendancepersentage',{"rmb_user_id":userId});
+            const resp = await api.post('attendancepersentage', { "rmb_user_id": userId });
             const data = await resp.data.data;
             setAttendanceData(data);
             console.log(data[0]?.attendance_percentage, 'Attendance Percentage');
@@ -222,8 +222,8 @@ const ProfileCard = () => {
     const getMeetings = async () => {
         try {
             setLoading(true);
-            const resp = await api.get('getnewmeetings');
-            console.log(resp.data,'meet')
+            const resp = await api.post('getnewmeetings');
+            console.log(resp.data, 'meet')
             setMeetinglength(resp.data)
             const data = await resp.data.data[0];
             console.log(data, 'Meeting Data')
@@ -251,52 +251,52 @@ const ProfileCard = () => {
     };
 
 
-const formatDate = (inputDate) => {
-  const date = new Date(inputDate);
-  const options = {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  };
+    const formatDate = (inputDate) => {
+        const date = new Date(inputDate);
+        const options = {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+        };
 
-  return date.toLocaleDateString('en-GB', options);
-};
+        return date.toLocaleDateString('en-GB', options);
+    };
 
-const convertTo12HourFormat = (time24) => {
-  const [hour, minute] = time24?.split(':');
-  const date = new Date();
-  date.setHours(parseInt(hour));
-  date.setMinutes(parseInt(minute));
+    const convertTo12HourFormat = (time24) => {
+        const [hour, minute] = time24?.split(':');
+        const date = new Date();
+        date.setHours(parseInt(hour));
+        date.setMinutes(parseInt(minute));
 
-  return date.toLocaleTimeString('en-US', {
-    hour: 'numeric',
-    minute: '2-digit',
-    hour12: true,
-  });
-};
-function convertTo12Hour(time24) {
-  const [hourStr, minute] = time24.split(':');
-  let hour = parseInt(hourStr, 10);
-  const ampm = hour >= 12 ? 'PM' : 'AM';
-  hour = hour % 12 || 12; // Converts 0 to 12
-  return `${hour}:${minute} ${ampm}`;
-}
+        return date.toLocaleTimeString('en-US', {
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true,
+        });
+    };
+    function convertTo12Hour(time24) {
+        const [hourStr, minute] = time24.split(':');
+        let hour = parseInt(hourStr, 10);
+        const ampm = hour >= 12 ? 'PM' : 'AM';
+        hour = hour % 12 || 12; // Converts 0 to 12
+        return `${hour}:${minute} ${ampm}`;
+    }
 
-console.log(attendanceData,"++++++++++++++++++++>>>>>>>>>>>>meetingLength?.data[0]")
+    console.log(attendanceData, "++++++++++++++++++++>>>>>>>>>>>>meetingLength?.data[0]")
 
 
     return (
         <View style={styles.container}>
             <StatusBar barStyle="dark-content" backgroundColor="#fff" />
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 24 }}
-            refreshControl={
-                <RefreshControl
-                    refreshing={refreshing}
-                    onRefresh={onRefresh}
-                    colors={[commonStyles.mainColor]}
-                />
-            }
+                refreshControl={
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={onRefresh}
+                        colors={[commonStyles.mainColor]}
+                    />
+                }
             >
                 {/* Top Icons */}
                 <View style={styles.topIcons}>
@@ -338,39 +338,39 @@ console.log(attendanceData,"++++++++++++++++++++>>>>>>>>>>>>meetingLength?.data[
                             </View>
                         </View> */}
 
-                        {
-                            attendanceData.length !==0  && (
-                    <View style={styles.sliderContainer}>
-                        <View style={styles.sliderTrack}>
-                            <View
-                                style={[
-                                    styles.sliderFill,
-                                    {
-                                        width: `${attendancePercentage}%`,
-                                        backgroundColor: getSliderColor(attendancePercentage),
-                                    },
-                                ]}
-                            />
-                        </View>
-                        <Text style={{marginTop:8,fontSize:16}}>{attendancePercentage?.toFixed(0)}%</Text>
-                        {/* <View style={styles.sliderLabels}>
+                    {
+                        attendanceData.length !== 0 && (
+                            <View style={styles.sliderContainer}>
+                                <View style={styles.sliderTrack}>
+                                    <View
+                                        style={[
+                                            styles.sliderFill,
+                                            {
+                                                width: `${attendancePercentage}%`,
+                                                backgroundColor: getSliderColor(attendancePercentage),
+                                            },
+                                        ]}
+                                    />
+                                </View>
+                                <Text style={{ marginTop: 8, fontSize: 16 }}>{attendancePercentage?.toFixed(0)}%</Text>
+                                {/* <View style={styles.sliderLabels}>
                             <Text style={styles.sliderLabel}>Very Bad</Text>
                             <Text style={styles.sliderLabel}>Bad</Text>
                             <Text style={styles.sliderLabel}>Average</Text>
                             <Text style={styles.sliderLabel}>Good</Text>
                         </View> */}
-                        <Text style={[styles.ratingLabel, { color: getSliderColor(attendancePercentage) }]}>
-                            {attendancePercentage <= 25
-                                ? 'Very Bad'
-                                : attendancePercentage <= 50
-                                    ? 'Bad'
-                                    : attendancePercentage <= 75
-                                        ? 'Average'
-                                        : 'Good'}
-                        </Text>
-                    </View>     
-                            )
-                        }
+                                <Text style={[styles.ratingLabel, { color: getSliderColor(attendancePercentage) }]}>
+                                    {attendancePercentage <= 25
+                                        ? 'Very Bad'
+                                        : attendancePercentage <= 50
+                                            ? 'Bad'
+                                            : attendancePercentage <= 75
+                                                ? 'Average'
+                                                : 'Good'}
+                                </Text>
+                            </View>
+                        )
+                    }
 
                 </TouchableOpacity>
 
@@ -409,8 +409,8 @@ console.log(attendanceData,"++++++++++++++++++++>>>>>>>>>>>>meetingLength?.data[
                                 <FontAwesome6 name="calendar-check" size={22} color={commonStyles.mainColor} />
                                 <Text style={styles.card2Title}>Attendance</Text>
                             </View>
-                            <Text style={[styles.card2Value, { marginTop: 8}]}>{ attendanceData? attendanceData[0]?.attended_meetings : 0}</Text>
-                            {/* <Text style={{fontSize:12,color:'#3d3d3d'}}>Given/Received</Text> */}
+                            <Text style={[styles.card2Value, { marginTop: 8 }]}>{attendanceData ? attendanceData[0]?.attended_meetings : 0} / {attendanceData ? attendanceData[0]?.total_meetings : 0}</Text>
+                            <Text style={{ fontSize: 10, color: '#3d3d3d' }}>Attended/Total</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -419,30 +419,30 @@ console.log(attendanceData,"++++++++++++++++++++>>>>>>>>>>>>meetingLength?.data[
 
                 {/* Next Meeting */}
                 {
-                    meetingLength?.data?.length !==0 ? (
-                <View style={styles.meetingCard}>
-                    <Text style={styles.nextTitle}>Next Meeting</Text>
-                    <View style={styles.meetingRow}>
-                        <Icon name="calendar" size={18} />
-                        <Text style={styles.meetingText}>{formatDate( meetingLength?.data&&meetingLength?.data[0]?.meeting_date)}</Text>
-                    </View>
-                    <View style={styles.meetingRow}>
-                        <Icon name="clock" size={18} />
-                        <Text style={styles.meetingText}>{meetingLength?.data&& meetingLength?.data[0]?.meeting_time ? convertTo12Hour(meetingLength?.data && meetingLength?.data[0]?.meeting_time) : 'N/A'}</Text>
-                    </View>
-                    <View style={styles.meetingRow}>
-                        <Icon name="map-pin" size={18} />
-                        <Text style={styles.meetingText}>{meetingLength?.data ? meetingLength?.data[0]?.meeting_venue : 'N/A'}</Text>
-                    </View>
-                    <TouchableOpacity onPress={() => navigation.navigate('AttendanceScreen',meetingLength.data[0])} style={styles.detailsButton}>
-                        <View style={{ flexDirection: 'row', gap: 12 }}>
-                            <Text style={styles.detailsText}>Meeting</Text>
+                    meetingLength?.data?.length !== 0 ? (
+                        <View style={styles.meetingCard}>
+                            <Text style={styles.nextTitle}>Next Meeting</Text>
+                            <View style={styles.meetingRow}>
+                                <Icon name="calendar" size={18} />
+                                <Text style={styles.meetingText}>{formatDate(meetingLength?.data && meetingLength?.data[0]?.meeting_date)}</Text>
+                            </View>
+                            <View style={styles.meetingRow}>
+                                <Icon name="clock" size={18} />
+                                <Text style={styles.meetingText}>{meetingLength?.data && meetingLength?.data[0]?.meeting_time ? convertTo12Hour(meetingLength?.data && meetingLength?.data[0]?.meeting_time) : 'N/A'}</Text>
+                            </View>
+                            <View style={styles.meetingRow}>
+                                <Icon name="map-pin" size={18} />
+                                <Text style={styles.meetingText}>{meetingLength?.data ? meetingLength?.data[0]?.meeting_venue : 'N/A'}</Text>
+                            </View>
+                            <TouchableOpacity onPress={() => navigation.navigate('AttendanceScreen', meetingLength.data[0])} style={styles.detailsButton}>
+                                <View style={{ flexDirection: 'row', gap: 12 }}>
+                                    <Text style={styles.detailsText}>Meeting</Text>
+                                </View>
+                            </TouchableOpacity>
                         </View>
-                    </TouchableOpacity>
-                </View>
                     ) : (
-                        <View style={{alignItems:"center",justifyContent:"center",marginTop:50}}>
-                        <Text style={{fontSize:14,fontWeight:"700",color:"#000"}}>No Meeting Scheduled Yet</Text>
+                        <View style={{ alignItems: "center", justifyContent: "center", marginTop: 50 }}>
+                            <Text style={{ fontSize: 14, fontWeight: "700", color: "#000" }}>No Meeting Scheduled Yet</Text>
                         </View>
                     )
                 }
@@ -615,13 +615,14 @@ const styles = StyleSheet.create({
         //right: 20,
         //bottom: 40,
         width: 68,
-        height: 68,
+        height: responsiveHeight(16),
+        // height:68,
         borderRadius: 28,
-        alignItems:"flex-end",
-        justifyContent:"center",
+        alignItems: "flex-end",
+        justifyContent: "center",
         zIndex: 999,
     },
-    menuButton:{
+    menuButton: {
         // position:'absolute',
         // top:responsiveHeight(40),
         // left:responsiveWidth(85),

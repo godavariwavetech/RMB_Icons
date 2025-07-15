@@ -41,7 +41,7 @@ const CustomModal = ({
               </Text>
             )}
             <TouchableOpacity onPress={onClose}>
-              <Feather name="x" size={16} color="#000" />
+              <Feather name="x" size={18} color="#000" />
             </TouchableOpacity>
           </View>
           <View style={{marginTop: 24}}>

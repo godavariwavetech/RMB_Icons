@@ -194,7 +194,7 @@ const customStyles = StyleSheet.create({
 });
 
 
-export default function RegistrationForm({route}) {
+export default function RegistrationForm({ route }) {
   const [photo, setPhoto] = useState(null);
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
@@ -203,7 +203,7 @@ export default function RegistrationForm({route}) {
   const [dob, setDob] = useState('');
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [company, setCompany] = useState('');
-const [designation, setDesignation] = useState('');
+  const [designation, setDesignation] = useState('');
 
 
   const [openDatePicker, setOpenDatePicker] = useState(false);
@@ -268,14 +268,14 @@ const [designation, setDesignation] = useState('');
     if (!business.trim()) newErrors.business = 'Business category is required';
     if (!area.trim()) newErrors.area = 'Area is required';
     if (!company.trim()) newErrors.company = 'Company name is required';
-if (!designation.trim()) newErrors.designation = 'Designation is required';
+    if (!designation.trim()) newErrors.designation = 'Designation is required';
 
     // if (!dob.trim()) newErrors.dob = 'Date of birth is required';
-     if (!dob.trim()) {
-    newErrors.dob = 'Date of birth is required';
-  } else if (dobDate > eighteenYearsAgo) {
-    newErrors.dob = 'Age must be at least 18 years';
-  }
+    if (!dob.trim()) {
+      newErrors.dob = 'Date of birth is required';
+    } else if (dobDate > eighteenYearsAgo) {
+      newErrors.dob = 'Age must be at least 18 years';
+    }
     if (!photo) newErrors.photo = 'Photo is required';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -315,7 +315,7 @@ if (!designation.trim()) newErrors.designation = 'Designation is required';
       navigation.navigate('RegistrationSubmittedScreen', name);
       // return
       // const resp = await axios.post('https://api.rnbicon.com/public_app/rnb_customer_registration', payload);
-      const resp = await api.post('rnb_customer_registration',payload)
+      const resp = await api.post('rnb_customer_registration', payload)
       // console.log('Data submitted successfully:', resp.data.data);
       const data = await resp.data
       console.log(data, 'data');
@@ -323,7 +323,7 @@ if (!designation.trim()) newErrors.designation = 'Designation is required';
         // alert('Registration successful!');
         dispatch(setUserId(data?.data?.insertId))
         navigation.navigate('RegistrationSubmittedScreen', name);
-      } else{
+      } else {
         Alert.alert(data.message);
       }
     } catch (error) {
@@ -339,10 +339,10 @@ if (!designation.trim()) newErrors.designation = 'Designation is required';
   maxDate.setFullYear(maxDate.getFullYear() - 18);
 
 
-  useEffect(()=>{
-    route.params?.mobileNUmber&& setPhone(route.params?.mobileNUmber)
+  useEffect(() => {
+    route.params?.mobileNUmber && setPhone(route.params?.mobileNUmber)
     setSelectedDate(maxDate); // Initialize selectedDate to maxDate
-  },[route.params?.afterLogin])
+  }, [route.params?.afterLogin])
 
   return (
     <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
@@ -378,22 +378,22 @@ if (!designation.trim()) newErrors.designation = 'Designation is required';
         error={errors.business}
       />
       <CustomInput
-  label="Company Name"
-  required
-  placeholder="Enter Your Company Name"
-  value={company}
-  onChangeText={setCompany}
-  error={errors.company}
-/>
+        label="Company Name"
+        required
+        placeholder="Enter Your Company Name"
+        value={company}
+        onChangeText={setCompany}
+        error={errors.company}
+      />
 
-<CustomInput
-  label="Designation"
-  required
-  placeholder="Enter Your Designation"
-  value={designation}
-  onChangeText={setDesignation}
-  error={errors.designation}
-/>
+      <CustomInput
+        label="Designation"
+        required
+        placeholder="Enter Your Designation"
+        value={designation}
+        onChangeText={setDesignation}
+        error={errors.designation}
+      />
 
       <CustomInput
         label="Area"

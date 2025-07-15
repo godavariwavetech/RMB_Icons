@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback} from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
     View,
     Text,
@@ -19,21 +19,23 @@ import { useDispatch, useSelector } from 'react-redux';
 import api from '../../utils/api';
 import CustomModal from '../../components/common/CustomModal';
 import { actionLogout, pushFcmToken } from '../../redux/reducers/auth';
+import Loader from '../../components/loader';
 
 const MemberProfile = () => {
     const [selectedButton, setSelectedButton] = useState(null); // null | 'give' | 'ask'
     const navigation = useNavigation();
 
-       const { userId } = useSelector(state => state.Auth);
+    const { userId } = useSelector(state => state.Auth);
     const [userName, setUserName] = useState('');
     const [userImage, setUserImage] = useState('');
     const [userCategory, setUserCategorey] = useState('');
-    const [designation,setDesignation] = useState('')
+    const [designation, setDesignation] = useState('')
     // const [userDob, setUserDob] = useState('');
     const [userPhone, setUserPhone] = useState('');
-    const [loading,setLoading] = useState(false);
+    const [loading, setLoading] = useState(false);
     const [showLogoutModal, setShowLogoutModal] = useState(false);
-    const [address,setAddress] = useState("")
+    const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false);
+    const [address, setAddress] = useState("")
     const dispatch = useDispatch();
 
     const handleLogout = () => {
@@ -42,13 +44,31 @@ const MemberProfile = () => {
         // navigation.navigate('LoginPage');
         navigation.dispatch(
             CommonActions.reset({
-              index: 0,
-              routes: [
-                {name: 'LoginPage'},
-              ],
+                index: 0,
+                routes: [
+                    { name: 'LoginPage' },
+                ],
             }),
-          );
+        );
     };
+
+    const deleteAccount = async()=>{
+        try {
+            const resp = await api.post('deleteaccount',{user_id:userId});
+            console.log(resp.data,'delete respopnse');
+            if(resp.data.status == 200){
+                setShowDeleteAccountModal(false);
+                navigation.replace('LoginPage');
+            }
+        } catch (err) {
+            console.log('Error',err);
+            Alert.alert('Error',err)
+        }
+    }
+
+    const handleDeleteAccount = () => {
+        deleteAccount()
+    }
 
     const handleShare = async () => {
         const contactInfo = {
@@ -144,33 +164,39 @@ const MemberProfile = () => {
     }, []));
 
     const FetchedData = async () => {
-            try {
-                setLoading(true)
-                const resp = await api.post('getrnb_customer', { "rnb_customer_id": userId});
-                console.log(resp.data.data[0], 'resssssssssssss');
-                const data = await resp.data.data[0];
-                console.log(data, 'data')
-                if (resp.data.status === 200) {
-                    setUserName(data?.rnb_customer_name);
-                    setUserImage(data?.rnb_customer_photo);
-                    setUserCategorey(data?.business_category);
-                    // setUserDob(data?.rnb_customer_dob)
-                    setUserPhone(data?.rnb_customer_phone_number);
-                    setDesignation(data?.designation);
-                    setAddress(data?.address_area)
-                    // setCompanyName(data?.company_name)
-                }
-    
-            } catch (error) {
-                console.log('Error', error)
-            } finally {
-                setLoading(false)
+        try {
+            setLoading(true)
+            const resp = await api.post('getrnb_customer', { "rnb_customer_id": userId });
+            console.log(resp.data.data[0], 'resssssssssssss');
+            const data = await resp.data.data[0];
+            console.log(data, 'data')
+            if (resp.data.status === 200) {
+                setUserName(data?.rnb_customer_name);
+                setUserImage(data?.rnb_customer_photo);
+                setUserCategorey(data?.business_category);
+                // setUserDob(data?.rnb_customer_dob)
+                setUserPhone(data?.rnb_customer_phone_number);
+                setDesignation(data?.designation);
+                setAddress(data?.address_area)
+                // setCompanyName(data?.company_name)
             }
+
+        } catch (error) {
+            console.log('Error', error)
+        } finally {
+            setLoading(false)
         }
+    }
+
+    if (loading) {
+        return (
+            <Loader size='large' color={commonStyles.mainColor} />
+        )
+    }
 
 
     return (
-        <View  style={styles.container} >
+        <View style={styles.container} >
             <View style={styles.header}>
                 <TouchableOpacity onPress={() => { navigation.goBack() }}>
                     <Feather name='arrow-left' size={24} color={'#0A1F3C'} />
@@ -184,12 +210,12 @@ const MemberProfile = () => {
 
                 {/* Profile Card */}
                 <View style={styles.profileCard}>
-                    <Image source={userImage ? {uri:userImage } : require('../../assets/personPlaceholder.jpg')} // replace with actual image
+                    <Image source={userImage ? { uri: userImage } : require('../../assets/personPlaceholder.jpg')} // replace with actual image
                         style={styles.profileImage}
                     />
-                    <Text style={commonStyles.heading}>{userName? userName : 'N/A'}</Text>
-                    <Text style={[commonStyles.text3, commonStyles.mb8, commonStyles.mt8]}>{designation ? designation :'N/A'}</Text>
-                    <Text style={[commonStyles.text3, commonStyles.mb24]}>{userCategory ? userCategory :'N/A'}</Text>
+                    <Text style={commonStyles.heading}>{userName ? userName : 'N/A'}</Text>
+                    <Text style={[commonStyles.text3, commonStyles.mb8, commonStyles.mt8]}>{designation ? designation : 'N/A'}</Text>
+                    <Text style={[commonStyles.text3, commonStyles.mb24]}>{userCategory ? userCategory : 'N/A'}</Text>
 
                     {/* Social Icons */}
                     {/* <View style={styles.socialRow}>
@@ -214,7 +240,7 @@ const MemberProfile = () => {
                 {/* Address */}
                 <View style={styles.addressWrapper}>
                     <Text style={[commonStyles.text3, { textAlign: 'center' }]}>
-                       {address}
+                        {address}
                     </Text>
                 </View>
 
@@ -248,7 +274,7 @@ const MemberProfile = () => {
                     ))}
 
                     {/* Logout (Red colored) */}
-                    
+
                     <TouchableOpacity style={[styles.menuItem, { marginTop: 12 }]} onPress={() => setShowLogoutModal(true)}>
                         <View style={styles.menuIcon}>
                             <Feather name="power" size={20} color="red" />
@@ -256,18 +282,40 @@ const MemberProfile = () => {
                         <Text style={[styles.menuLabel, { color: 'red' }]}>Logout</Text>
                         <Entypo name="chevron-thin-right" size={22} color={'red'} />
                     </TouchableOpacity>
-                </View>
-                <Text style={[{fontsize:14,fontWeight:'500',color:commonStyles.mainColor},commonStyles.mt12]}>Version 1.0.2</Text>
 
+                    {/* Delete account */}
+
+                    <TouchableOpacity style={[styles.menuItem, { marginTop: 12 }]} onPress={() => setShowDeleteAccountModal(true)}>
+                        <View style={styles.menuIcon}>
+                            <FontAwesome6 name="trash-can" size={20} color={'red'} />
+                        </View>
+                        <Text style={[styles.menuLabel, { color: 'red' }]}>Delete Account</Text>
+                        <Entypo name="chevron-thin-right" size={22} color={'red'} />
+                    </TouchableOpacity>
+                </View>
+                <Text style={[{ fontsize: 14, fontWeight: '500', color: commonStyles.mainColor }, commonStyles.mt12]}>Version 1.0.2</Text>
+
+                {/* Logout */}
                 <CustomModal
-                visible={showLogoutModal}
-                onClose={() => setShowLogoutModal(false)}
-                onConfirm={handleLogout}
-                title="Confirm Logout"
-                content="Are you sure you want to log out?"
-                confirmText="Logout"
-                cancelText="Cancel"
-            />
+                    visible={showLogoutModal}
+                    onClose={() => setShowLogoutModal(false)}
+                    onConfirm={handleLogout}
+                    title="Confirm Logout"
+                    content="Are you sure you want to log out?"
+                    confirmText="Logout"
+                    cancelText="Cancel"
+                />
+
+                {/* delete account */}
+                <CustomModal
+                    visible={showDeleteAccountModal}
+                    onClose={() => setShowDeleteAccountModal(false)}
+                    onConfirm={handleDeleteAccount}
+                    title="Confirm Delete Account"
+                    content="Are you sure you want to delete Account?"
+                    confirmText="Delete"
+                    cancelText="Cancel"
+                />
             </ScrollView>
         </View>
     );
