@@ -276,6 +276,7 @@ const MeetingScreen = () => {
             setShowDatePicker(false);
           }}
           onCancel={() => setShowDatePicker(false)}
+           maximumDate={new Date()}
         />
 
         <TextInput

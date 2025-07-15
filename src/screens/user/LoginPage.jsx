@@ -48,6 +48,7 @@ const LoginScreen = () => {
           navigation.navigate('RegistrationSubmittedScreen',phone);
         }
         else if(resp.payload.status==202){
+          Alert.alert("Login Failed","You don't have an account. Please register first.")
           navigation.navigate('RegistrationForm',{afterLogin:true,mobileNUmber:phone});
         }
       } catch (error) {
@@ -148,6 +149,7 @@ const LoginScreen = () => {
                 )
               }
             </TouchableOpacity>
+
         <Text style={styles.signUpText}>
         Don't have an account?{' '}
         <Text style={styles.signUpLink} onPress={() => navigation.navigate('RegistrationForm')}>Sign Up</Text>

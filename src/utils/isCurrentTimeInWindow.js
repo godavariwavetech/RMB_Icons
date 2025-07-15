@@ -16,6 +16,9 @@ export const isCurrentTimeInWindow = (dataObj) => {
   const meetingTime = parseTime(meeting_date, meeting_time);
   const entryTime = parseTime(meeting_date, entry_time);
 
+  console.log(meetingTime,'Meeting time');
+  console.log(entryTime,'entryTime',now >= meetingTime && now <= entryTime)
+
   // Validate times
   if (!meetingTime || !entryTime) {
     return false; // Invalid date/time format
@@ -24,6 +27,7 @@ export const isCurrentTimeInWindow = (dataObj) => {
   if (meetingTime > entryTime) {
     return false; // Invalid time range
   }
+
 
   // Return whether current time is within range
   return now >= meetingTime && now <= entryTime;

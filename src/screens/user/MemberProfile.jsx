@@ -11,6 +11,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import Feather from 'react-native-vector-icons/Feather';
 import Entypo from 'react-native-vector-icons/Entypo';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import commonStyles from '../../commonstyles/CommonStyles';
 import { CommonActions, useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
@@ -20,12 +21,14 @@ import api from '../../utils/api';
 import CustomModal from '../../components/common/CustomModal';
 import { actionLogout, pushFcmToken } from '../../redux/reducers/auth';
 import Loader from '../../components/loader';
+import VersionCheck from 'react-native-version-check'
 
 const MemberProfile = () => {
     const [selectedButton, setSelectedButton] = useState(null); // null | 'give' | 'ask'
     const navigation = useNavigation();
 
     const { userId } = useSelector(state => state.Auth);
+    const [userData,setUserData] = useState({});
     const [userName, setUserName] = useState('');
     const [userImage, setUserImage] = useState('');
     const [userCategory, setUserCategorey] = useState('');
@@ -95,7 +98,8 @@ const MemberProfile = () => {
     const MenuItems = [
         {
             label: 'Account Settings',
-            icon: <Feather name="user" size={20} color={commonStyles.mainColor} />,
+            // icon: <Feather name="user" size={20} color={commonStyles.mainColor} />,
+             icon: <Feather name="settings" size={20} color={commonStyles.mainColor} />,
             onPress: () => navigation.navigate('AccountSettingsScreen'),
         },
         // {
@@ -105,7 +109,8 @@ const MemberProfile = () => {
         // },
         {
             label: 'My Meetings',
-            icon: <MaterialCommunityIcons name="account-group-outline" size={20} color={commonStyles.mainColor} />,
+            // icon: <MaterialCommunityIcons name="account-group-outline" size={20} color={commonStyles.mainColor} />,
+             icon: <MaterialCommunityIcons name="calendar-account" size={20} color={commonStyles.mainColor} />,
             onPress: () => navigation.navigate('MyMeetings'),
         },
         {
@@ -113,6 +118,19 @@ const MemberProfile = () => {
             icon: <Feather name="link" size={20} color={commonStyles.mainColor} />,
             onPress: () => navigation.navigate('MyLinksScreen'),
         },
+         {
+            label: 'My Members',
+            // icon: <MaterialCommunityIcons name="account-group-outline" size={20} color={commonStyles.mainColor} />,
+                icon: <MaterialCommunityIcons name="account-multiple" size={20} color={commonStyles.mainColor} />,
+            onPress: () => navigation.navigate('MyMembers'),
+        },
+          {
+            label: 'Support',
+            // icon: <MaterialCommunityIcons name="account-group-outline" size={20} color={commonStyles.mainColor} />,
+             icon: <Ionicons name="help-circle-outline" size={22} color={commonStyles.mainColor} />,
+            onPress: () => navigation.navigate('SupportScreen'),
+        },
+
         // {
         //     label: 'Update Username & password',
         //     icon: <Feather name="lock" size={20} color={commonStyles.mainColor} />,
@@ -171,13 +189,14 @@ const MemberProfile = () => {
             const data = await resp.data.data[0];
             console.log(data, 'data')
             if (resp.data.status === 200) {
-                setUserName(data?.rnb_customer_name);
-                setUserImage(data?.rnb_customer_photo);
-                setUserCategorey(data?.business_category);
-                // setUserDob(data?.rnb_customer_dob)
-                setUserPhone(data?.rnb_customer_phone_number);
-                setDesignation(data?.designation);
-                setAddress(data?.address_area)
+                setUserData(data);
+                // setUserName(data?.rnb_customer_name);
+                // setUserImage(data?.rnb_customer_photo);
+                // setUserCategorey(data?.business_category);
+                // // setUserDob(data?.rnb_customer_dob)
+                // setUserPhone(data?.rnb_customer_phone_number);
+                // setDesignation(data?.designation);
+                // setAddress(data?.address_area)
                 // setCompanyName(data?.company_name)
             }
 
@@ -210,12 +229,13 @@ const MemberProfile = () => {
 
                 {/* Profile Card */}
                 <View style={styles.profileCard}>
-                    <Image source={userImage ? { uri: userImage } : require('../../assets/personPlaceholder.jpg')} // replace with actual image
+                    <Image source={userData?.rnb_customer_photo ? { uri: userData?.rnb_customer_photo } : require('../../assets/personPlaceholder.jpg')} // replace with actual image
                         style={styles.profileImage}
                     />
-                    <Text style={commonStyles.heading}>{userName ? userName : 'N/A'}</Text>
-                    <Text style={[commonStyles.text3, commonStyles.mb8, commonStyles.mt8]}>{designation ? designation : 'N/A'}</Text>
-                    <Text style={[commonStyles.text3, commonStyles.mb24]}>{userCategory ? userCategory : 'N/A'}</Text>
+                    <Text style={commonStyles.heading}>{userData?  userData?.rnb_customer_name : 'N/A'}</Text>
+                    <Text style={[commonStyles.text3, commonStyles.mb8, commonStyles.mt8]}>{userData? userData?.designation  : 'N/A'}</Text>
+                    <Text style={[commonStyles.text3, commonStyles.mb8]}>{userData ?  userData?.business_category  : 'N/A'}</Text>
+                    <Text style={[commonStyles.text3, commonStyles.mb16]}>{userData ?  userData?.company_name  : 'N/A'}</Text>
 
                     {/* Social Icons */}
                     {/* <View style={styles.socialRow}>
@@ -240,7 +260,7 @@ const MemberProfile = () => {
                 {/* Address */}
                 <View style={styles.addressWrapper}>
                     <Text style={[commonStyles.text3, { textAlign: 'center' }]}>
-                        {address}
+                        {userData ? userData?.address_area : 'N/A'}
                     </Text>
                 </View>
 
@@ -293,7 +313,7 @@ const MemberProfile = () => {
                         <Entypo name="chevron-thin-right" size={22} color={'red'} />
                     </TouchableOpacity>
                 </View>
-                <Text style={[{ fontsize: 14, fontWeight: '500', color: commonStyles.mainColor }, commonStyles.mt12]}>Version 1.0.2</Text>
+                <Text style={[{ fontsize: 14, fontWeight: '500', color: commonStyles.mainColor }, commonStyles.mt12]}>Version {VersionCheck.getCurrentVersion()}</Text>
 
                 {/* Logout */}
                 <CustomModal

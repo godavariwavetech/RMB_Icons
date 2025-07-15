@@ -26,11 +26,9 @@ import ReferralScreen from '../screens/user/ReferralScreen';
 import NotificationsScreen from '../screens/user/NotificationsScreen';
 import AttendanceScreen from '../screens/user/AttendanceScreen';
 import ReferralSlipScreen from '../screens/user/ReferralSlipScreen';
-// import ReferralSlipScreen from '../screens/user/ReferralSlipScreen';
-// import RegistrationForm from '../screens/user/RegistrationForm';
-// import DriverRegistrationScreen from '../screens/user/DriverRegistrationScreen';
-// import VehicleRegistrationScreen from '../screens/user/VehicleRegistrationScreen';
-// import RideHistoryDetailsScreen from '../screens/user/RideHistoryDetailsScreen';
+import MyMembers from '../screens/user/MyMembers';
+import SupportScreen from '../screens/user/SupportScreen';
+
 const Stack = createStackNavigator();
 
 const AppNavigation = () => {
@@ -59,10 +57,8 @@ const AppNavigation = () => {
       <Stack.Screen name='NotificationsScreen' component={NotificationsScreen} />
       <Stack.Screen name='AttendanceScreen' component={AttendanceScreen} />
       <Stack.Screen name='ReferralSlipScreen' component={ReferralSlipScreen} />
-      {/* <Stack.Screen name='RefrralSlipScreen' component={ReferralSlipScreen} /> */}
-      {/* <Stack.Screen name='DriverRegistrationScreen' component={DriverRegistrationScreen} />
-      <Stack.Screen name='VehicleRegistrationScreen' component={VehicleRegistrationScreen} />
-      <Stack.Screen name='RideHistoryDetailsScreen' component={RideHistoryDetailsScreen} /> */}
+      <Stack.Screen name='MyMembers' component={MyMembers} />  
+      <Stack.Screen name='SupportScreen' component={SupportScreen} />
 
     </Stack.Navigator>
   );

@@ -8,10 +8,14 @@ import Toast from 'react-native-toast-message';
 import NetInfo from '@react-native-community/netinfo';
 import {getFCMToken} from './src/services/NotificationsService';
 import { checkNotifications, requestNotifications, RESULTS } from 'react-native-permissions';
+import { Linking } from 'react-native';
+import CustomModal2 from './src/components/common/CustomModal2';
+import VersionCheck from 'react-native-version-check'
 
 const App = () => {
   const [isOffline, setIsOffline] = useState(false); // Track network status
   const [isInitialLoad, setIsInitialLoad] = useState(true); // Track initial component load
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
 
   const checkAndRequestPermissions = async () => {
     try {
@@ -34,7 +38,34 @@ const App = () => {
     await getFCMToken();
   };
 
+  const handleUpdate = async () => {
+    try {
+      console.log("Open playstore")
+      Linking.openURL("https://play.google.com/store/apps/details?id=com.rmbicons&pcampaignid=web_share")
+    } catch (error) {
+      console.log("Play Store link error:", error);
+    } finally {
+      setShowUpdateModal(false);
+    }
+  };
+
+  const checkForUpdate = async () => {
+    try {
+      const res = await VersionCheck.needUpdate();
+      console.log(res,"++++++++++++++rerpererp")
+      if (res?.isNeeded) {
+        console.log("first")
+        setShowUpdateModal(true);
+      }else{
+        console.log("second")
+        setShowUpdateModal(false);
+      }
+    } catch (error) {
+      console.log("Error checking for updates:", error);
+    }
+  };
   useEffect(() => {
+    checkForUpdate()
     SplashScreen.hide();
     // getToken();
     checkAndRequestPermissions();
@@ -84,6 +115,14 @@ const App = () => {
       <NavigationContainer>
         <AppNavigation />
         <Toast />
+        <CustomModal2
+            visible={showUpdateModal}
+            title="Update Available"
+            message="A new version of the app is available. Please update to continue using all features."
+            confirmText="Update Now"
+            onConfirm={handleUpdate}
+            cancelText=''
+          />
       </NavigationContainer>
     </Provider>
   );

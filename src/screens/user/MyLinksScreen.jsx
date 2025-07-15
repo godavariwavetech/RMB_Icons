@@ -363,7 +363,7 @@ const handleModalSubmit = async () => {
                     style={[styles.modalButton, styles.cancelButton]}
                     onPress={() => setModalVisible(false)}
                   >
-                    <Text style={styles.modalButtonText}>Cancel</Text>
+                    <Text style={[styles.modalButtonText,{color:'red'}]}>Cancel</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={[styles.modalButton, styles.deleteButtonModal]} onPress={handleModalDelete}>
                     <Text style={styles.modalButtonText}>Delete</Text>
@@ -400,7 +400,7 @@ const handleModalSubmit = async () => {
                     style={[styles.modalButton, styles.cancelButton]}
                     onPress={() => setModalVisible(false)}
                   >
-                    <Text style={styles.modalButtonText}>Cancel</Text>
+                    <Text style={[styles.modalButtonText,{color:'red'}]}>Cancel</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={styles.modalButton} onPress={handleModalSubmit}>
                     <Text style={styles.modalButtonText}>Submit</Text>
@@ -589,7 +589,10 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
   },
   cancelButton: {
-    backgroundColor: '#FF3B30',
+    // backgroundColor: '#FF3B30',
+    backgroundColor: '#fff',
+    borderWidth:1,
+    borderColor:'red'
   },
   modalButtonText: {
     color: '#fff',

@@ -173,7 +173,7 @@ const AttendanceScreen = () => {
         }
     };
 
-    const checkIfWithinRadius = (radiusInMeters = 100, currentLocation) => {
+    const checkIfWithinRadius = (radiusInMeters = 500, currentLocation) => {
         if (!currentLocation) {
             console.log("Cannot check radius: current location not available.");
             return false;
@@ -257,7 +257,7 @@ const AttendanceScreen = () => {
             longitude: meetingData?.longitude || 0,
         };
         const distance = haversine(userLocation, target, { unit: 'meter' });
-        const radiusInMeters = 100; // Define your radius
+        const radiusInMeters = 500; // Define your radius
         const isInRadius = distance <= radiusInMeters;
 
         console.log("Is in time:", isInTime);
@@ -307,14 +307,17 @@ const AttendanceScreen = () => {
             } finally {
                 setApiLoading(false); // Hide loader after API call
             }
-        } else if (!isInRadius) {
-            Alert.alert('Outside Location', 'You are not within the meeting radius. Please reach the venue to mark attendance.');
-            setShowErrorModal(true);
         } else if (!isInTime) {
-            Alert.alert('Time Window Error', 'You are outside the designated time window for this meeting.');
+            // Alert.alert('Time Window Error', 'You are outside the designated time window for this meeting.');
+            Alert.alert('Meeting Not Available Now','You are trying to attend the meeting outside the allowed time.')
+            // setShowErrorModal(true);
+        } else if (!isInRadius) {
+            // Alert.alert('Outside Location', 'You are not within the meeting radius. Please reach the venue to mark attendance.');
             setShowErrorModal(true);
         }
     };
+
+    const alreadyAttended = meetingData?.meeting_attend_status === 0;
 
     return (
         <View style={{ flex: 1, backgroundColor: "#fff" }}>
@@ -343,12 +346,18 @@ const AttendanceScreen = () => {
                             <Icon name="map-pin" size={18} />
                             <Text style={styles.meetingText}>{meetingData?.meeting_venue}</Text>
                         </View>
-                        <TouchableOpacity style={styles.detailsButton} onPress={openCamera} disabled={locationLoading || !userCurrentLocation}>
-                            <View style={{ flexDirection: 'row', gap: 12 }}>
-                                <Text style={styles.detailsText}>Go To Meeting</Text>
-                                <Ionicons name='arrow-forward' size={20} color="#fff" />
+                        {alreadyAttended ? (
+                            <View style={[styles.detailsButton, { backgroundColor: '#ccc' }]}> 
+                                <Text style={[styles.detailsText, { color: '#888' }]}>Already attended</Text>
                             </View>
-                        </TouchableOpacity>
+                        ) : (
+                            <TouchableOpacity style={styles.detailsButton} onPress={openCamera} disabled={locationLoading || !userCurrentLocation}>
+                                <View style={{ flexDirection: 'row', gap: 12 }}>
+                                    <Text style={styles.detailsText}>Go To Meeting</Text>
+                                    <Ionicons name='arrow-forward' size={20} color="#fff" />
+                                </View>
+                            </TouchableOpacity>
+                        )}
                     </View>
                 ) : (
                     <View style={styles.noMeetingCard}>

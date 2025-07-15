@@ -66,7 +66,7 @@ const LeadsGivenScreen = () => {
         try {
             const resp = await api.get('gettotalregisterd');
             const data = await resp.data.data || [];
-            console.log(data[0], 'data')
+            console.log(data, 'data')
             if (resp.data.status == 200) {
                 setAllMembers(data); // store all
                 setFilteredMembers(data); // initially same

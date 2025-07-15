@@ -12,7 +12,9 @@ const initialState = {
   optCode: '',
   mobileNumber: '',
   isLogged:false,
-  userId:''
+  userId:'',
+  userName:'',
+  userPhone:'',
 };
 
 export const verifyMobile = createAsyncThunk(
@@ -151,7 +153,13 @@ export const AuthSlice = createSlice({
     },
     setUserId:(state,action)=>{
       state.userId=action.payload
-    }
+    },
+    setUserName:(state,action)=>{
+      state.userName = action.payload
+    },
+     setUserPhone:(state,action)=>{
+      state.userPhone = action.payload
+    },
   },
   extraReducers: builder => {
     builder.addCase(loginAction.pending, (state, action) => {
@@ -205,6 +213,6 @@ export const AuthSlice = createSlice({
   },
 });
 
-export const {actionLogout, actionLogin, setMobile, setInitial , setUserId} = AuthSlice.actions;
+export const {actionLogout, actionLogin, setMobile, setInitial , setUserId,setUserName,setUserPhone} = AuthSlice.actions;
 
 export default AuthSlice.reducer;

@@ -70,16 +70,34 @@ const OTPVerificationScreen = () => {
     }
   };
 
+  // useEffect(() => {
+  //     const countdown = setInterval(() => {
+  //      if (timer > 0) {
+  //        setTimer(timer - 1);
+  //      } else {
+  //        clearInterval(countdown);
+  //      }
+  //    }, 1000);
+  //    return () => clearInterval(countdown);
+  // }, [timer]);
+
   useEffect(() => {
-    const countdown = setInterval(() => {
-      if (timer > 0) {
-        setTimer(timer - 1);
-      } else {
+  if (timer === 0) return;
+
+  const countdown = setInterval(() => {
+    setTimer(prevTimer => {
+      if (prevTimer <= 1) {
         clearInterval(countdown);
+        return 0;
       }
-    }, 1000);
-    return () => clearInterval(countdown);
-  }, [timer]);
+      return prevTimer - 1;
+    });
+  }, 1000);
+
+  return () => clearInterval(countdown);
+}, [timer]);
+
+
 
   const handleVerifyOtp = async () => {
     if (otp.includes('')) {
@@ -139,6 +157,7 @@ const OTPVerificationScreen = () => {
     dispatch(requestLoginOtp(phone));
     setOtp(['', '', '', '']);
     inputRefs.current[0]?.focus();
+     setTimer(60); // Restart timer
   };
 
   const onConfirmModal = () => {

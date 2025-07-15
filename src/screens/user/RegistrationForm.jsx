@@ -321,7 +321,8 @@ export default function RegistrationForm({ route }) {
       console.log(data, 'data');
       if (data.status === 200) {
         // alert('Registration successful!');
-        dispatch(setUserId(data?.data?.insertId))
+        dispatch(setUserId(data?.data?.insertId));
+
         navigation.navigate('RegistrationSubmittedScreen', name);
       } else {
         Alert.alert(data.message);

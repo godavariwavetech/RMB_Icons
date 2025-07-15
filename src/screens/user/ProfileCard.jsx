@@ -12,29 +12,33 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import api from '../../utils/api';
 import { responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions';
 import ProfileCardSkeleton from './ProfileCardSkeleton';
-import { pushFcmToken } from '../../redux/reducers/auth';
+import { pushFcmToken, setUserName, setUserPhone } from '../../redux/reducers/auth';
 
 
 
 const ProfileCard = () => {
     const { userId } = useSelector(state => state.Auth);
-    const dispatch = useDispatch()
-    const [userName, setUserName] = useState('');
+    const dispatch = useDispatch();
+    const [userData,setUserData] = useState({});
+    // const [userName, setUserName] = useState('');
     const [userImage, setUserImage] = useState('');
     const [userCategory, setUserCategorey] = useState('');
-    const [userDob, setUserDob] = useState('');
-    const [userPhone, setUserPhone] = useState('');
+    // const [userDob, setUserDob] = useState('');
+    // const [userPhone, setUserPhone] = useState('');
     const [loading, setLoading] = useState(false);
     const [attendancePercentage, setAttendancePercentage] = useState(null);
-    const [designation, setDesignation] = useState('');
-    const [companyName, setCompanyName] = useState('');
+    // const [designation, setDesignation] = useState('');
+    // const [companyName, setCompanyName] = useState('');
     const [refreshing, setRefreshing] = useState(false);
 
     const navigation = useNavigation();
+    //   const dispatch = useDispatch();
+    
     const [meetingData, setMeetingData] = useState({});
     const [meetingLength, setMeetinglength] = useState([]);
     const [draggableMenuVisible, setDraggableMenuVisible] = useState(false);
     const [homePageCounts, setHomePageCounts] = useState({});
+    const [weeklyHomePageCounts, setWeeklyHomePageCounts] = useState({});
     const [attendanceData, setAttendanceData] = useState({});
     // const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
     // const ICON_SIZE = 56; // Total icon size with padding
@@ -44,7 +48,7 @@ const ProfileCard = () => {
         setRefreshing(true);
         FetchedData();
         getMeetings();
-        getHomePageCounts();
+        getWeeklyHomePageCounts();
         getAttendancePercentage()
         setRefreshing(false);
     }, []);
@@ -158,6 +162,7 @@ const ProfileCard = () => {
     useFocusEffect(useCallback(() => {
         FetchedData();
         getMeetings();
+        getWeeklyHomePageCounts()
         getHomePageCounts();
         getAttendancePercentage()
     }, []));
@@ -186,13 +191,16 @@ const ProfileCard = () => {
             const data = await resp.data.data[0];
             console.log(data, 'data')
             if (resp.data.status === 200) {
-                setUserName(data?.rnb_customer_name);
-                setUserImage(data?.rnb_customer_photo);
-                setUserCategorey(data?.business_category);
-                setUserDob(data?.rnb_customer_dob)
-                setUserPhone(data?.rnb_customer_phone_number);
-                setDesignation(data?.designation);
-                setCompanyName(data?.company_name)
+                setUserData(data)
+                // setUserName(data?.rnb_customer_name);
+                // setUserImage(data?.rnb_customer_photo);
+                // setUserCategorey(data?.business_category);
+                // setUserDob(data?.rnb_customer_dob)
+                // setUserPhone(data?.rnb_customer_phone_number);
+                // setDesignation(data?.designation);
+                // setCompanyName(data?.company_name);
+                dispatch(setUserName(data?.rnb_customer_name));
+                dispatch(setUserPhone(data?.rnb_customer_phone_number));
             }
 
         } catch (error) {
@@ -219,16 +227,38 @@ const ProfileCard = () => {
         }
     }
 
+        const getWeeklyHomePageCounts = async () => {
+        try {
+            setLoading(true);
+            const resp = await api.post('gethomepageweekcounts',{
+                "rmb_user_id": userId
+            });
+            // console.log(resp.data,'meet')
+            const data = await resp.data.data[0];
+            console.log(data, 'Weekly Meeting Data')
+            if (resp.data.status == 200) {
+                setWeeklyHomePageCounts(resp.data)
+                // setWeeklyMeetingData(resp.data.data);
+            }
+        } catch (error) {
+            console.log('Error', error)
+        } finally {
+            setLoading(false);
+        }
+    }
+
     const getMeetings = async () => {
         try {
             setLoading(true);
-            const resp = await api.post('getnewmeetings');
-            console.log(resp.data, 'meet')
+            const resp = await api.post('getnewmeetings',{
+                "rmb_user_id": userId
+            });
+            console.log(resp.data,'meet')
             setMeetinglength(resp.data)
             const data = await resp.data.data[0];
             console.log(data, 'Meeting Data')
             if (resp.data.status == 200) {
-                setMeetingData(resp.data.data)
+                setMeetingData(resp.data.data);
             }
         } catch (error) {
             console.log('Error', error)
@@ -314,15 +344,15 @@ const ProfileCard = () => {
                 {/* Profile Card */}
                 <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('MemberProfile')}>
                     <View style={styles.profileRow}>
-                        <Image source={userImage ? { uri: userImage } : require('../../assets/personPlaceholder.jpg')} style={styles.profileImage} />
+                        <Image source={userData ? { uri: userData?.rnb_customer_photo } : require('../../assets/personPlaceholder.jpg')} style={styles.profileImage} />
                         <View style={{ flex: 1 }}>
                             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                                <Text style={styles.name}>{userName ? userName : 'N/A'}</Text>
+                                <Text style={styles.name}>{userData ? userData?.rnb_customer_name : 'N/A'}</Text>
                                 <Ionicons name='arrow-forward-circle-sharp' size={26} color={commonStyles.mainColor} />
                             </View>
-                            <Text style={styles.role}>{designation}</Text>
-                            <Text style={styles.industry}>{userCategory ? userCategory : 'N/A'}</Text>
-                            <Text style={styles.chapter}>{userPhone ? userPhone : 'N/A'}</Text>
+                            <Text style={styles.role}>{userData ? userData?.designation : 'N/A'}</Text>
+                            <Text style={styles.industry}>{userData ? userData?.business_category  : 'N/A'}</Text>
+                            <Text style={styles.chapter}>{userData ? userData?.rnb_customer_phone_number : 'N/A'}</Text>
                             {/* <Text style={styles.rating}>Good</Text> */}
                         </View>
                     </View>
@@ -359,26 +389,30 @@ const ProfileCard = () => {
                             <Text style={styles.sliderLabel}>Average</Text>
                             <Text style={styles.sliderLabel}>Good</Text>
                         </View> */}
+                        <View style={{flexDirection:'row'}}>
+
+                        </View>
+                          {/* <Text style={{textAlign:'left'}}>attendance</Text> */}
                                 <Text style={[styles.ratingLabel, { color: getSliderColor(attendancePercentage) }]}>
-                                    {attendancePercentage <= 25
+                                    {attendancePercentage < 25
                                         ? 'Very Bad'
-                                        : attendancePercentage <= 50
-                                            ? 'Bad'
-                                            : attendancePercentage <= 75
-                                                ? 'Average'
-                                                : 'Good'}
+                                        : attendancePercentage < 50
+                                        ? 'Bad'
+                                        : attendancePercentage < 75
+                                        ? 'Average'
+                                        : 'Good'}
                                 </Text>
+                                {/* <Text style={{textAlign:'left'}}>attendance</Text> */}
                             </View>
                         )
                     }
 
                 </TouchableOpacity>
 
-                {/* <ImageBackground source={require('../../assets/rmbbgLogo.png')} style={{flex:1}}
-            resizeMode='contain'
-            imageStyle={{width:'250',height:200,alignItems:'center',flex:1}}
-            > */}
+                {/* user history (Leads give, Thankyou Note, 1:1 Meets , Attendance)  in a week  */}
+
                 <View style={{ gap: 16, marginTop: 24, }}>
+                <Text style={styles.sectionTitle}>Weekly Activity</Text>
 
                     <View style={{ flexDirection: 'row', gap: 16 }}>
                         <TouchableOpacity style={styles.card2} onPress={() => navigation.navigate('LeadsGivenScreen')}>
@@ -386,14 +420,14 @@ const ProfileCard = () => {
                                 <MaterialIcons name="people-alt" size={24} color={commonStyles.mainColor} />
                                 <Text style={styles.card2Title}>Leads Given</Text>
                             </View>
-                            <Text style={[styles.card2Value, { marginTop: 8 }]}>{homePageCounts?.leads_given ?? 0}</Text>
+                            <Text style={[styles.card2Value, { marginTop: 8 }]}>{weeklyHomePageCounts?.leads_given ?? 0}</Text>
                         </TouchableOpacity>
                         <TouchableOpacity style={[styles.card2, { flex: 1 }]} onPress={() => navigation.navigate('ThankYouNoteScreen')}>
                             <View style={{ flexDirection: 'row', gap: 12 }}>
                                 <FontAwesome6 name="coins" size={22} color={commonStyles.mainColor} />
                                 <Text style={styles.card2Title}>Thankyou Note</Text>
                             </View>
-                            <Text style={[styles.card2Value, { marginTop: 8 }]}>&#8377; {homePageCounts?.thankyounote_count ?? 0}</Text>
+                            <Text style={[styles.card2Value, { marginTop: 8 }]}>&#8377; {weeklyHomePageCounts?.thankyounote_count ?? 0}</Text>
                         </TouchableOpacity>
                     </View>
                     <View style={{ flexDirection: 'row', gap: 16 }}>
@@ -402,24 +436,31 @@ const ProfileCard = () => {
                                 <FontAwesome6 name="handshake-simple" size={24} color={commonStyles.mainColor} />
                                 <Text style={styles.card2Title}>1:1 Meets</Text>
                             </View>
-                            <Text style={[styles.card2Value, { marginTop: 8 }]}>{homePageCounts?.one_to_one_meeting_count ?? 0}</Text>
+                            <Text style={[styles.card2Value, { marginTop: 8 }]}>{weeklyHomePageCounts?.one_to_one_meeting_count ?? 0}</Text>
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.card2} onPress={() => navigation.navigate('MyMeetings')}>
                             <View style={{ flexDirection: 'row', gap: 16 }}>
                                 <FontAwesome6 name="calendar-check" size={22} color={commonStyles.mainColor} />
                                 <Text style={styles.card2Title}>Attendance</Text>
                             </View>
-                            <Text style={[styles.card2Value, { marginTop: 8 }]}>{attendanceData ? attendanceData[0]?.attended_meetings : 0} / {attendanceData ? attendanceData[0]?.total_meetings : 0}</Text>
-                            <Text style={{ fontSize: 10, color: '#3d3d3d' }}>Attended/Total</Text>
+                            {
+                                attendanceData?.length==0 ? (
+                                    <Text style={[styles.card2Value, { marginTop: 8 }]}>0</Text>
+                                ) : (
+                                    <>
+                                    <Text style={[styles.card2Value, { marginTop: 8 }]}>{attendanceData ? attendanceData[0]?.attended_meetings : 0} / {attendanceData ? attendanceData[0]?.total_meetings : 0}</Text>
+                                    <Text style={{ fontSize: 10, color: '#3d3d3d' }}>Attended/Total</Text>
+                                    </>
+                                )
+                            }
                         </TouchableOpacity>
                     </View>
                 </View>
-                {/* </ImageBackground> */}
 
 
                 {/* Next Meeting */}
                 {
-                    meetingLength?.data?.length !== 0 ? (
+                    meetingLength?.data?.length !== 0 && (
                         <View style={styles.meetingCard}>
                             <Text style={styles.nextTitle}>Next Meeting</Text>
                             <View style={styles.meetingRow}>
@@ -440,13 +481,51 @@ const ProfileCard = () => {
                                 </View>
                             </TouchableOpacity>
                         </View>
-                    ) : (
-                        <View style={{ alignItems: "center", justifyContent: "center", marginTop: 50 }}>
-                            <Text style={{ fontSize: 14, fontWeight: "700", color: "#000" }}>No Meeting Scheduled Yet</Text>
-                        </View>
-                    )
+                    ) 
+                    // : (
+                    //     <View style={{ alignItems: "center", justifyContent: "center", marginTop: 50 }}>
+                    //         <Text style={{ fontSize: 14, fontWeight: "700", color: "#000" }}>No Meeting Scheduled Yet</Text>
+                    //     </View>
+                    // )
                 }
-                {/* <Ionicons name='arrow-forward' size={20} color="#fff" /> */}
+
+                 {/* user history (Leads given, Thankyou Note, 1:1 Meets , Attendance)  total   */}
+
+                 {/* User History (Total) */}
+                <View style={{ marginTop: 24, gap: 12 }}>
+                    <Text style={styles.sectionTitle}>Total Activity</Text>
+                    <TouchableOpacity style={styles.historyRow} >
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                            <MaterialIcons name="people-alt" size={20} color={commonStyles.mainColor} />
+                            <Text style={styles.historyText}>Leads Given</Text>
+                        </View>
+                        <Text style={styles.historyCount}>{homePageCounts?.leads_given ?? 0}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.historyRow} >
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                            <FontAwesome6 name="coins" size={18} color={commonStyles.mainColor} />
+                            <Text style={styles.historyText}>Thankyou Note</Text>
+                        </View>
+                        <Text style={styles.historyCount}>₹ {homePageCounts?.thankyounote_count ?? 0}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.historyRow} >
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                            <FontAwesome6 name="handshake-simple" size= {20} color={commonStyles.mainColor} />
+                            <Text style={styles.historyText}>1:1 Meets</Text>
+                        </View>
+                        <Text style={styles.historyCount}>{homePageCounts?.one_to_one_meeting_count ?? 0}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.historyRow} >
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                            <FontAwesome6 name="calendar-check" size={18} color={commonStyles.mainColor} />
+                            <Text style={styles.historyText}>Attendance</Text>
+                        </View>
+                        <Text style={styles.historyCount}>
+                            {attendanceData?.length === 0 ? 0 : `${attendanceData[0]?.attended_meetings ?? 0}/${attendanceData[0]?.total_meetings ?? 0}`}
+                        </Text>
+                    </TouchableOpacity>
+                </View>
+
             </ScrollView>
             {/* <TouchableOpacity onPress={() => console.log('Notification')} style={styles.floatingBell}>
                 <Image source={require('../../assets/bellIcon.png')} style={{ width: '50', height: '50' }} />
@@ -594,21 +673,6 @@ const styles = StyleSheet.create({
         marginTop: 4,
     },
 
-    // Floating Bell Icon Styles
-
-    // floatingBell: {
-    //   position: 'absolute',
-    //   backgroundColor: '#ffcc00',
-    //   padding: 12,
-    //   borderRadius: 28,
-    //   zIndex: 1000,
-    //   elevation: 5,
-    //   shadowColor: '#000',
-    //   shadowOffset: { width: 0, height: 2 },
-    //   shadowOpacity: 0.25,
-    //   shadowRadius: 3.84,
-    // },
-
     floatingBell: {
         position: 'absolute',
         // backgroundColor: 'blue', // Add background color for visibility
@@ -628,7 +692,44 @@ const styles = StyleSheet.create({
         // left:responsiveWidth(85),
         // top:responsiveHeight(50),
         // left:responsiveWidth(82)
-    }
+    },
+
+
+
+
+
+
+
+
+    // New styles for total activity section
+    sectionTitle: {
+        fontSize: 16,
+        fontWeight: '700',
+        color: '#000',
+        marginBottom: 8,
+    },
+    historyRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingVertical: 12,
+        paddingHorizontal: 16,
+        backgroundColor: '#fff',
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: commonStyles.mainColor,
+        marginBottom: 8,
+    },
+    historyText: {
+        fontSize: 14,
+        color: '#000',
+        fontWeight: '500',
+    },
+    historyCount: {
+        fontSize: 16,
+        fontWeight: '700',
+        color: '#000',
+    },
 });
 
 export default ProfileCard;
