@@ -332,12 +332,12 @@ const ProfileCard = () => {
                 <View style={styles.topIcons}>
                     <View style={styles.iconBlock}>
                         <Image source={{ uri: "https://rnbicon.com/upload_images/other/ellipse2.png" }} style={styles.userIcon} />
-                        <Text style={styles.iconLabel}>Icons Chapter{"\n"}President</Text>
+                        <Text style={styles.iconLabel}>Icons Charter{"\n"}President</Text>
                     </View>
                     <Image source={require('../../assets/rmbProfileLogo.png')} style={styles.rmbLogo} />
                     <View style={styles.iconBlock}>
                         <Image source={{ uri: "https://rnbicon.com/upload_images/other/ellipse1.png" }} style={styles.userIcon} />
-                        <Text style={styles.iconLabel}>RMB Chapter{"\n"}President</Text>
+                        <Text style={styles.iconLabel}>RMB Charter{"\n"}President</Text>
                     </View>
                 </View>
 

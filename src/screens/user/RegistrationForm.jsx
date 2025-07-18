@@ -22,7 +22,7 @@ import axios from 'axios';
 import Loader from '../../components/loader';
 import { useNavigation } from '@react-navigation/native';
 import { useDispatch } from 'react-redux';
-import { setUserId } from '../../redux/reducers/auth';
+import { pushFcmToken, setUserId } from '../../redux/reducers/auth';
 import api from '../../utils/api';
 
 // 📌 Reusable Custom Input with Label
@@ -298,7 +298,7 @@ export default function RegistrationForm({ route }) {
   };
 
   const SubmitData = async () => {
-
+    dispatch(pushFcmToken())
     try {
       setLoading(true);
       const payload = {
