@@ -14,11 +14,11 @@ import {responsiveWidth} from 'react-native-responsive-dimensions';
 import commonStyles from '../../commonstyles/CommonStyles';
 
 const SplashScreen = ({navigation}) => {
-  const {userId} = useSelector(state => state.Auth);
+  const {userId,isVerified} = useSelector(state => state.Auth);
   const { rehydrated } = useSelector(state => state.Auth._persist);
 
   const navigateToApp = () => {
-    if (!userId) {
+    if (!userId || !isVerified) {
       navigation.replace('LoginPage');
     } else {
       navigation.replace('ProfileCard');

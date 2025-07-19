@@ -15,6 +15,7 @@ const initialState = {
   userId:'',
   userName:'',
   userPhone:'',
+  isVerified:false
 };
 
 export const verifyMobile = createAsyncThunk(
@@ -110,14 +111,14 @@ export const addAttendence = createAsyncThunk(
 export const pushFcmToken = createAsyncThunk(
   'pushFcmToken',
   async (
-    _,
+    user,
     {getState, rejectWithValue, fulfillWithValue},
   ) => {
     const {userId} = getState().Auth;
     const token = await getFCMToken();
     console.log(userId,"+++++++++++++AUTH USER")
     const payload={
-        "rmb_user_id": `${userId}`,
+        "rmb_user_id": user? `${user}`:`${userId}`,
         "player_id": token,
         "user_type": "0"
     }
@@ -161,6 +162,10 @@ export const AuthSlice = createSlice({
      setUserPhone:(state,action)=>{
       state.userPhone = action.payload
     },
+    setVerified:(state,action)=>{
+      state.isVerified = action.payload
+    },
+    
   },
   extraReducers: builder => {
     builder.addCase(loginAction.pending, (state, action) => {
@@ -214,6 +219,6 @@ export const AuthSlice = createSlice({
   },
 });
 
-export const {actionLogout, actionLogin, setMobile, setInitial , setUserId,setUserName,setUserPhone} = AuthSlice.actions;
+export const {actionLogout, actionLogin, setMobile, setInitial , setUserId,setUserName,setUserPhone,setVerified} = AuthSlice.actions;
 
 export default AuthSlice.reducer;

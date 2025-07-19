@@ -63,7 +63,7 @@ const CustomInput = ({ label, required, placeholder, value, onChangeText, keyboa
         keyboardType={keyboardType}
         editable={!!onChangeText}
         pointerEvents={!!onChangeText ? 'auto' : 'none'}
-        maxLength={maxLength} // Add maxLength prop for phone number
+        maxLength={maxLength}
       />
 
       {error && <Text style={customStyles.error}>{error}</Text>}
@@ -298,7 +298,6 @@ export default function RegistrationForm({ route }) {
   };
 
   const SubmitData = async () => {
-    dispatch(pushFcmToken())
     try {
       setLoading(true);
       const payload = {
@@ -322,7 +321,7 @@ export default function RegistrationForm({ route }) {
       if (data.status === 200) {
         // alert('Registration successful!');
         dispatch(setUserId(data?.data?.insertId));
-
+        dispatch(pushFcmToken(data?.data?.insertId))
         navigation.navigate('RegistrationSubmittedScreen', name);
       } else {
         Alert.alert(data.message);
@@ -366,9 +365,9 @@ export default function RegistrationForm({ route }) {
         placeholder="Enter Your Phone Number"
         value={phone}
         onChangeText={setPhone}
-        keyboardType="numeric"
+        keyboardType="phone-pad"
         error={errors.phone}
-        maxLength={10} // Limit to 10 digits
+        maxLength={10}
       />
       <CustomInput
         label="Business Category"

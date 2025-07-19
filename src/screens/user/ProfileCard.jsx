@@ -352,7 +352,7 @@ const ProfileCard = () => {
                             </View>
                             <Text style={styles.role}>{userData ? userData?.designation : 'N/A'}</Text>
                             <Text style={styles.industry}>{userData ? userData?.business_category  : 'N/A'}</Text>
-                            <Text style={styles.chapter}>{userData ? userData?.rnb_customer_phone_number : 'N/A'}</Text>
+                            <Text style={styles.chapter}>{userData ? userData?.company_name : 'N/A'}</Text>
                             {/* <Text style={styles.rating}>Good</Text> */}
                         </View>
                     </View>
@@ -392,8 +392,7 @@ const ProfileCard = () => {
                         <View style={{flexDirection:'row'}}>
 
                         </View>
-                          {/* <Text style={{textAlign:'left'}}>attendance</Text> */}
-                                <Text style={[styles.ratingLabel, { color: getSliderColor(attendancePercentage) }]}>
+                                {/* <Text style={[styles.ratingLabel, { color: getSliderColor(attendancePercentage) }]}>
                                     {attendancePercentage < 25
                                         ? 'Very Bad'
                                         : attendancePercentage < 50
@@ -401,8 +400,7 @@ const ProfileCard = () => {
                                         : attendancePercentage < 75
                                         ? 'Average'
                                         : 'Good'}
-                                </Text>
-                                {/* <Text style={{textAlign:'left'}}>attendance</Text> */}
+                                </Text> */}
                             </View>
                         )
                     }
@@ -441,15 +439,15 @@ const ProfileCard = () => {
                         <TouchableOpacity style={styles.card2} onPress={() => navigation.navigate('MyMeetings')}>
                             <View style={{ flexDirection: 'row', gap: 16 }}>
                                 <FontAwesome6 name="calendar-check" size={22} color={commonStyles.mainColor} />
-                                <Text style={styles.card2Title}>Attendance</Text>
+                                <Text style={styles.card2Title}>Past Meetings</Text>
                             </View>
                             {
                                 attendanceData?.length==0 ? (
                                     <Text style={[styles.card2Value, { marginTop: 8 }]}>0</Text>
                                 ) : (
                                     <>
-                                    <Text style={[styles.card2Value, { marginTop: 8 }]}>{attendanceData ? attendanceData[0]?.attended_meetings : 0} / {attendanceData ? attendanceData[0]?.total_meetings : 0}</Text>
-                                    <Text style={{ fontSize: 10, color: '#3d3d3d' }}>Attended/Total</Text>
+                                    <Text style={[styles.card2Value, { marginTop: 8 }]}>{attendanceData ? attendanceData[0]?.attended_meetings : 0 }</Text>
+                                    {/* <Text style={{ fontSize: 10, color: '#3d3d3d' }}>Attended/Total</Text> */}
                                     </>
                                 )
                             }

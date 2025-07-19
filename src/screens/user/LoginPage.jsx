@@ -18,7 +18,7 @@ import api from '../../utils/api';
 import Loader from '../../components/loader';
 import axios from 'axios';
 import { useDispatch } from 'react-redux';
-import { requestLoginOtp } from '../../redux/reducers/auth';
+import { requestLoginOtp, setVerified } from '../../redux/reducers/auth';
 
 const LoginScreen = () => {
   const dispatch = useDispatch()
@@ -44,7 +44,9 @@ const LoginScreen = () => {
         // return
         if(resp.payload.status==200){
           navigation.navigate('OTPVerificationScreen',phone);
+          dispatch(setVerified(true))
         } else if (resp.payload.status==201){
+          dispatch(setVerified(false))
           navigation.navigate('RegistrationSubmittedScreen',phone);
         }
         else if(resp.payload.status==202){
@@ -130,8 +132,8 @@ const LoginScreen = () => {
               maxLength={10}
               // onChangeText={text => setPhone(text)}
               onChangeText={(text) => {
-                const numericText = text.replace(/[^0-9]/g, '')
-                setPhone(numericText)
+                // const numericText = text.replace(/[^0-9]/g, '')
+                setPhone(text)
                 setError('')
               }}
               value={phone}
