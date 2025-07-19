@@ -312,10 +312,10 @@ export default function RegistrationForm({ route }) {
         "designation": designation,
       }
       console.log(payload, 'payload');
-      navigation.navigate('RegistrationSubmittedScreen', name);
       // return
       // const resp = await axios.post('https://api.rnbicon.com/public_app/rnb_customer_registration', payload);
       const resp = await api.post('rnb_customer_registration', payload)
+      // navigation.navigate('RegistrationSubmittedScreen', name);
       // console.log('Data submitted successfully:', resp.data.data);
       const data = await resp.data
       console.log(data, 'data');

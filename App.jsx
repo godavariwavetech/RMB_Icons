@@ -8,7 +8,7 @@ import Toast from 'react-native-toast-message';
 import NetInfo from '@react-native-community/netinfo';
 import {getFCMToken} from './src/services/NotificationsService';
 import { checkNotifications, requestNotifications, RESULTS } from 'react-native-permissions';
-import { Linking } from 'react-native';
+import { Linking, AppState } from 'react-native';
 import CustomModal2 from './src/components/common/CustomModal2';
 import VersionCheck from 'react-native-version-check'
 
@@ -69,6 +69,18 @@ const App = () => {
     SplashScreen.hide();
     // getToken();
     checkAndRequestPermissions();
+
+    // Add AppState listener to re-check for updates on foreground
+    const subscription = AppState.addEventListener('change', (nextAppState) => {
+      if (nextAppState === 'active') {
+        checkForUpdate();
+      }
+    });
+
+    return () => {
+      // Cleanup AppState listener
+      subscription.remove();
+    };
   }, []);
 
   // Check network status

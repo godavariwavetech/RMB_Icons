@@ -117,11 +117,12 @@ export const pushFcmToken = createAsyncThunk(
     const token = await getFCMToken();
     console.log(userId,"+++++++++++++AUTH USER")
     const payload={
-        "rmb_user_id": userId,
+        "rmb_user_id": `${userId}`,
         "player_id": token,
         "user_type": "0"
     }
     const response = await api.post(endpoints.POST_TOKEN,payload);
+    console.log(response.data,"+++++++++++++++++>>>>>>")
     if (response) {
       if (response.data) {
         return fulfillWithValue(response.data);
